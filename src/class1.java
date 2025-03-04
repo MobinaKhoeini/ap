@@ -10,25 +10,27 @@ import java.util.Scanner;
 
 public class class1 {
     public static void main(String[] args) {
-       Scanner S = new Scanner(System.in);
-       int n = S.nextInt();
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (i == 0 || i == n - 1  || j == 0  || j == n - 1)
-                {
-                    System.out.print("* ");
-                }
-                else {
-                    System.out.print("  ");
-                }
+        System.out.println("please enter the side length of the diamond:");
+        Scanner n = new Scanner(System.in);
+        int sLength = n.nextInt();
+        for (int i = 0 ; i < sLength; i++) {
+            for (int j = 0; j < sLength - i - 1 ; j++) {
+                System.out.print(" ");
             }
-            System.out.print(" ");
-            for (int j = 0; j < n; j++) {
-                System.out.print("* ");
+            for (int j = 0; j < (2 * i + 1); j++) {
+                System.out.print("*");
             }
             System.out.println();
         }
-
+        for (int i = sLength - 2; i >= 0 ; i--) {
+            for (int j = 0; j <  sLength - i - 1; j++) {
+                System.out.print(" ");
+            }
+            for (int j = 0; j <= 2 * i ; j++) {
+                System.out.print("*");
+            }
+            System.out.println();
+        }
 
     }
 }
