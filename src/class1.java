@@ -2,6 +2,7 @@ import com.sun.xml.internal.ws.encoding.soap.SOAP12Constants;
 import sun.reflect.generics.reflectiveObjects.LazyReflectiveObjectGenerator;
 
 import javax.sound.midi.Sequence;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,53 +10,63 @@ import java.util.Scanner;
 
 public class class1 {
     public static void main(String[] args) {
-        System.out.println("please enter a string:");
+        System.out.println("please enter the size of array:");
+        Scanner scanner = new Scanner(System.in);
+        int size = scanner.nextInt();
+        System.out.println("please enter the floating-point numbers:");
         Scanner s = new Scanner(System.in);
-        String str = s.nextLine();
-        String upperCase = printUppercaseLetter(str);
-        System.out.println("upper case letters: " + upperCase);
-        String secondLetters = printSecondLetter(str);
-        System.out.println("second letters: " + secondLetters);
-        String replaceVowels = replaceVowels(str);
-        System.out.println(replaceVowels);
-        printVowelsWithIndex(str);
-    }
-
-    public static String printSecondLetter(String s) {
-        StringBuilder result = new StringBuilder();
-        String[] words = s.split(" ");
-        for (String word : words)
-            if (word.length() > 1)
-            {
-                result.append(word.charAt(1));
-            }
-        return result.toString();
-
-    }
-
-    public static String printUppercaseLetter(String s) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (Character.isUpperCase(c))
-            {
-                result.append(c);
-            }
+        float[] floatNum = new float[size];
+        for (int i = 0; i < floatNum.length; i++) {
+            floatNum[i] = s.nextFloat();
         }
-        return result.toString();
+        float avarage = 0, min = 0, max = 0, range = 0;
+        avarage = getAverage(floatNum);
+        System.out.println("the average: " + avarage);
+        min = getSmallest(floatNum);
+        System.out.println("the smallest: " + min);
+        max = getlargest(floatNum);
+        System.out.println("the largest: " + max);
+        range = getRange(max , min);
+        System.out.println("the range: " + range);
     }
-
-    public static String replaceVowels(String s) {
-        return s.replaceAll("[aeiouAEIOU]", "_");
-    }
-
-    public static void printVowelsWithIndex(String s) {
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if ("aeiouAEIOU".indexOf(c) != -1)
-            {
-                System.out.println(c + " " + "index:" + i);
-            }
+    public static float getAverage (float[] numbers)
+    {
+        float sum = 0;
+        float average = 0;
+        for (int i = 0; i < numbers.length; i++) {
+            sum += numbers[i];
         }
+        average = sum / numbers.length;
+        return average;
     }
+    public static float getSmallest (float[] numbers)
+    {
+        float min = numbers[0];
+        for (int i = 0; i < numbers.length; i++) {
+            if (min > numbers[i])
+            {
+                min = numbers[i];
+            }
+
+        }
+        return min;
+    }
+    public static float getlargest (float[] numbers)
+    {
+        float max = numbers[0];
+        for (int i = 0; i < numbers.length; i++) {
+            if (max < numbers[i])
+            {
+                max = numbers[i];
+            }
+
+        }
+        return max;
+    }
+    public static  float getRange(float max, float min){
+        float range = 0;
+        range = max - min;
+        return range;
+    }
+
 }
