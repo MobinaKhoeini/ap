@@ -9,6 +9,7 @@ public class Main_EX2_PM_1_5 {
         Scanner s = new Scanner(System.in);
         int k = s.nextInt();
         int n = 1, m = 1;
+        int c = 1, d = 1;
         char[][] Arr = new char[k+2][k+2];
         for (int i = 0; i < k + 2 ; i++) {
             for (int j = 0; j < k + 2; j++) {
@@ -45,11 +46,13 @@ public class Main_EX2_PM_1_5 {
             if (m == 0 || n == 0 || m == k - 1 || n == k - 1)
             {
                 System.out.println("hitting the game wall");
-                n = 1;
-                m = 1;
+                 n = c;
+                 m = d;
             }
             else{
                 Arr[n][m] = 'X';
+                c = n;
+                d = m;
                 for (int i = 0; i < k + 2; i++) {
                     for (int j = 0; j < k + 2; j++) {
                         System.out.print(Arr[i][j]);
