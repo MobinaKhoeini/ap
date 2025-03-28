@@ -10,8 +10,8 @@ public class Main_EX2_PM_2_2 {
         int k = s.nextInt();
         String choice;
         int n = 1, m = 1;
-        int e = 1, d = 1;
         int score=0;
+        int e = 1, d = 1;
         char[][] Arr = new char[k+2][k+2];
         for (int i = 0; i < k + 2 ; i++) {
             for (int j = 0; j < k + 2; j++) {
