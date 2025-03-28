@@ -51,6 +51,7 @@ public class Main_EX2_PM_1_5 {
             }
             else{
                 Arr[n][m] = 'X';
+                
                 c = n;
                 d = m;
                 for (int i = 0; i < k + 2; i++) {
