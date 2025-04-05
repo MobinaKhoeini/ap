@@ -121,8 +121,11 @@ public class Main_EX2_PM_3_1 extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
-        if (e.getKeyCode() == KeyEvent.VK_UP)
+        if (e.getKeyCode() == KeyEvent.VK_Q) {
+            System.out.println("game finished");
+            System.exit(0);
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_UP)
             direction = 3;
         else if (e.getKeyCode() == KeyEvent.VK_DOWN)
             direction = 4;
