@@ -45,7 +45,7 @@ public class Main_EX2_PM_3_1 extends JFrame implements KeyListener {
 
     private void drawScore(Graphics2D g2d) {
         g2d.setColor(Color.BLACK);
-        String s = "Score: " + score; //A
+        String s = "Score: " + score;
         g2d.drawString(s, 25, 50);
     }
 
@@ -84,7 +84,29 @@ public class Main_EX2_PM_3_1 extends JFrame implements KeyListener {
                 break;
         }
         pacmanPoint.setLocation(pacmanPoint.x + xMovement, pacmanPoint.y + yMovement);
+        handleCrossBorder();
     }
+    private void handleCrossBorder() {
+    int maxX = (width / boxSize) - 3;
+    int maxY = (height / boxSize) - 3;
+    int minX = 2;
+    int minY = 7;
+    System.out.println(pacmanPoint.x);
+    System.out.println(pacmanPoint.y);
+    if (pacmanPoint.x < minX) {
+        pacmanPoint.x = minX;
+    }
+    if (pacmanPoint.x > maxX) {
+        pacmanPoint.x = maxX;
+    }
+    if (pacmanPoint.y < minY) {
+        pacmanPoint.y = minY;
+    }
+    if (pacmanPoint.y > maxY) {
+        pacmanPoint.y = maxY;
+    }
+}
+
 
     private void getNewDotPointLocation() {
         Random rand = new Random();
@@ -99,6 +121,7 @@ public class Main_EX2_PM_3_1 extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+
         if (e.getKeyCode() == KeyEvent.VK_UP)
             direction = 3;
         else if (e.getKeyCode() == KeyEvent.VK_DOWN)
