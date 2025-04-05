@@ -14,18 +14,27 @@ public class Main_EX2_PM_3_1 extends JFrame implements KeyListener {
     final int LEFT = 1, RIGHT = 2, TOP = 3, BOTTOM = 4;
     Point dotPoint = new Point();
     private int score = 0;
+    private final int MAX_SCORE = 10;
+    private final long GAME_TIME = 30_000;
+    private long startTime;
+    private boolean gameOver = false;
 
     public Main_EX2_PM_3_1() {
         addKeyListener(this);
         pacmanPoint.setLocation((width / boxSize) / 2, (height / boxSize) / 2);
         getNewDotPointLocation();
         setSize(width, height);
+        startTime = System.currentTimeMillis();
     }
 
     @Override
     public void paint(Graphics g) {
         Graphics2D g2D = (Graphics2D) g;
         g.clearRect(0, 0, width, height);
+        checkGameStatus();
+        if (gameOver) {
+            return;
+        }
         logic();
         drawPacman(g2D);
         drawDotPoint(g2D);
@@ -47,6 +56,11 @@ public class Main_EX2_PM_3_1 extends JFrame implements KeyListener {
         g2d.setColor(Color.BLACK);
         String s = "Score: " + score;
         g2d.drawString(s, 25, 50);
+        long elapsed = System.currentTimeMillis() - startTime;
+        long remaining = (GAME_TIME - elapsed) / 1000;
+        if (remaining > 0) {
+        g2d.drawString("Time:" + remaining + "s", 25, 70);
+        }
     }
 
     private void logic() {
@@ -145,6 +159,21 @@ public class Main_EX2_PM_3_1 extends JFrame implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+    }
+    private void checkGameStatus() {
+        if (gameOver) return;
+        long elapsed = System.currentTimeMillis() - startTime;
+        if (score >= MAX_SCORE) {
+            System.out.println("congratulations! you reached the maximum number of score");
+            JOptionPane.showMessageDialog(this, "you won! final score: " + score);
+            System.exit(0);
+        }
+        else if (elapsed >= GAME_TIME) {
+            gameOver = true;
+            System.out.println("time's up! final score: " + score);
+            JOptionPane.showMessageDialog(this, "time's up! final score: "+ score);
+            System.exit(0);
+        }
     }
     public static void main(String[] args) {
         Main_EX2_PM_3_1 frame = new Main_EX2_PM_3_1();
