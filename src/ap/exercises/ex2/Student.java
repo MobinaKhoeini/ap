@@ -11,4 +11,13 @@ public class Student {
         this.studentNumber = studentNumber;
         this.fieldOfStudy = fieldOfStudy;
     }
+    @Override
+    public String toString() {
+        return "Book{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", studentNumber=" + studentNumber +
+                ", fieldOfStudy='" + fieldOfStudy + '\'' +
+                '}';
+    }
 }
