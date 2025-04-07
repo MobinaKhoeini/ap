@@ -11,4 +11,13 @@ public class Book {
         this.pageNumber = pageNumber;
         this.publicationYear = publicationYear;
     }
+    @Override
+    public String toString() {
+        return "Book{" +
+                "name='" + name + '\'' +
+                ", author='" + author + '\'' +
+                ", pageNumber=" + pageNumber +
+                ", publicationYear=" + publicationYear +
+                '}';
+    }
 }
