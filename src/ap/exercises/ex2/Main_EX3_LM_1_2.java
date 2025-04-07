@@ -26,9 +26,27 @@ public class Main_EX3_LM_1_2 {
         } catch (IOException e) {
             System.out.println("error writing books to file");
         }
+
+        Book[] writtenBooks = new Book[4];
+        try (
+                BufferedReader reader = new BufferedReader(new FileReader("D:/saveBooks.txt"))) {
+            for (int i = 0; i < 4; i++) {
+                String line = reader.readLine();
+                if (line != null) {
+                    String[] parts = line.split(",");
+                    writtenBooks[i] = new Book(parts[0], parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+                }
+            }
+        } catch (
+                IOException e) {
+            System.out.println("error reading from file");
+        }
+        for (Book book : writtenBooks) {
+            System.out.println(book);
+        }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("D:/saveStudents.txt"))) {
             for (Student student : students) {
-                writer.write(student.firstName + " " + student.lastName + "," + student.studentNumber + "," + student.fieldOfStudy);
+                writer.write(student.firstName + "," + student.lastName + "," + student.studentNumber + "," + student.fieldOfStudy);
                 writer.newLine();
             }
             System.out.println("students written successfully");
@@ -37,5 +55,24 @@ public class Main_EX3_LM_1_2 {
         } catch (IOException e) {
             System.out.println("error writing students to file");
         }
+        Student[] writtenStudents = new Student[3];
+        try (
+                BufferedReader reader = new BufferedReader(new FileReader("D:/saveStudents.txt"))) {
+            for (int i = 0; i < 3; i++) {
+                String line = reader.readLine();
+                if (line != null) {
+                    String[] parts = line.split(",");
+                    writtenStudents[i] = new Student(parts[0], parts[1], Integer.parseInt(parts[2]), (parts[3]));
+                }
+            }
+        } catch (
+                IOException e) {
+            System.out.println("error reading from file");
+        }
+        for (Student student : writtenStudents) {
+            System.out.println(student);
+        }
+
+
     }
 }
