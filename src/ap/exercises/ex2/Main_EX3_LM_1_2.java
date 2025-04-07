@@ -15,64 +15,76 @@ public class Main_EX3_LM_1_2 {
                 new Student("Mahya", "Ahmadi", 404, "Chemistry engineering"),
                 new Student("Ahmad", "hassani", 401, "Electrical engineering")
         };
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("D:/saveBooks.txt"))) {
+
+        // Write and read books
+        writeBooksToFile(books, "D:/saveBooks.txt");
+        Book[] writtenBooks = readBooksFromFile("D:/saveBooks.txt", books.length);
+        for (Book book : writtenBooks) {
+            System.out.println(book);
+        }
+
+        // Write and read students
+        writeStudentsToFile(students, "D:/saveStudents.txt");
+        Student[] writtenStudents = readStudentsFromFile("D:/saveStudents.txt", students.length);
+        for (Student student : writtenStudents) {
+            System.out.println(student);
+        }
+    }
+
+    public static void writeBooksToFile(Book[] books, String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (Book book : books) {
                 writer.write(book.name + "," + book.author + "," + book.pageNumber + "," + book.publicationYear);
                 writer.newLine();
             }
-            writer.close();
-            System.out.println("books written successfully");
-
+            System.out.println("Books written successfully");
         } catch (IOException e) {
-            System.out.println("error writing books to file");
+            System.out.println("Error writing books to file: " + e.getMessage());
         }
+    }
 
-        Book[] writtenBooks = new Book[4];
-        try (
-                BufferedReader reader = new BufferedReader(new FileReader("D:/saveBooks.txt"))) {
-            for (int i = 0; i < 4; i++) {
+    public static Book[] readBooksFromFile(String fileName, int size) {
+        Book[] books = new Book[size];
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            for (int i = 0; i < size; i++) {
                 String line = reader.readLine();
                 if (line != null) {
                     String[] parts = line.split(",");
-                    writtenBooks[i] = new Book(parts[0], parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+                    books[i] = new Book(parts[0], parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
                 }
             }
-        } catch (
-                IOException e) {
-            System.out.println("error reading from file");
+        } catch (IOException e) {
+            System.out.println("Error reading books from file: " + e.getMessage());
         }
-        for (Book book : writtenBooks) {
-            System.out.println(book);
-        }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("D:/saveStudents.txt"))) {
+        return books;
+    }
+
+    public static void writeStudentsToFile(Student[] students, String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (Student student : students) {
-                writer.write(student.firstName + "," + student.lastName + "," + student.studentNumber + "," + student.fieldOfStudy);
+                writer.write(student.firstName + "," + student.lastName + "," +
+                        student.studentNumber + "," + student.fieldOfStudy);
                 writer.newLine();
             }
-            System.out.println("students written successfully");
-            writer.close();
-
+            System.out.println("Students written successfully");
         } catch (IOException e) {
-            System.out.println("error writing students to file");
+            System.out.println("Error writing students to file: " + e.getMessage());
         }
-        Student[] writtenStudents = new Student[3];
-        try (
-                BufferedReader reader = new BufferedReader(new FileReader("D:/saveStudents.txt"))) {
-            for (int i = 0; i < 3; i++) {
+    }
+
+    public static Student[] readStudentsFromFile(String fileName, int size) {
+        Student[] students = new Student[size];
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            for (int i = 0; i < size; i++) {
                 String line = reader.readLine();
                 if (line != null) {
                     String[] parts = line.split(",");
-                    writtenStudents[i] = new Student(parts[0], parts[1], Integer.parseInt(parts[2]), (parts[3]));
+                    students[i] = new Student(parts[0], parts[1], Integer.parseInt(parts[2]), parts[3]);
                 }
             }
-        } catch (
-                IOException e) {
-            System.out.println("error reading from file");
+        } catch (IOException e) {
+            System.out.println("Error reading students from file: " + e.getMessage());
         }
-        for (Student student : writtenStudents) {
-            System.out.println(student);
-        }
-
-
+        return students;
     }
 }
