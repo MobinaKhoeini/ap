@@ -103,12 +103,25 @@ public class Main_EX2_PM_2_4 {
             int prevM = m;
             Arr[n][m] = ' ';
             switch (direction) {
-                case 0: n--; break;
-                case 1: m++; break;
-                case 2: n++; break;
-                case 3: m--; break;
+                case 0:{
+                    System.out.println("UP");
+                    n--;
+                } break;
+                case 1:{
+                    System.out.println("RIGHT");
+                    m++;
+                } break;
+                case 2:{
+                    System.out.println("DOWN");
+                    n++;
+                } break;
+                case 3:{
+                    System.out.println("LEFT");
+                    m--;
+                } break;
             }
             if (Arr[n][m] == '*') {
+                System.out.println("hitting the game wall");
                 n = prevN;
                 m = prevM;
             }
