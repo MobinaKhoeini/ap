@@ -29,13 +29,17 @@ public class EX3_LM_1_3 {
                 new Student("Ahmad", "hassani", 401, "Electrical engineering")
         };
         searchStudentByName(students, "sahar");
-
     }
     public static void searchStudentByName(Student[] students, String name) {
+        boolean findStudent = false;
         for (Student student : students) {
             if (student.firstName.equalsIgnoreCase(name) || student.lastName.equalsIgnoreCase(name)) {
                 System.out.println(student);
+                findStudent = true;
             }
+        }
+        if (!findStudent) {
+            System.out.println("no students found!");
         }
     }
 }
