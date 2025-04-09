@@ -13,7 +13,7 @@ public class Student {
     }
     @Override
     public String toString() {
-        return "Book{" +
+        return "Student{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", studentNumber=" + studentNumber +
