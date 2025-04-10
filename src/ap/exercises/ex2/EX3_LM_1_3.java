@@ -39,7 +39,7 @@ public class EX3_LM_1_3 {
             }
         }
         if (!findStudent) {
-            System.out.println("no students found !");
+            System.out.println("no students found!");
         }
     }
 }
