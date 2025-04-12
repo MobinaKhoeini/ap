@@ -1,6 +1,6 @@
 package ap.exercises.ex2;
 
-public class EX3_LM_1_3 {
+public class Main_EX3_LM_1_3 {
     public static class Student {
         public String firstName;
         public String lastName;
