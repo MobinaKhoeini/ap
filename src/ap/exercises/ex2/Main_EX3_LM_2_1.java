@@ -3,6 +3,25 @@ package ap.exercises.ex2;
 import java.io.*;
 import java.util.Scanner;
 public class Main_EX3_LM_2_1 {
+    public static class Student {
+        String firstName;
+        String lastName;
+        int studentNumber;
+        String fieldOfStudy;
+        Book[] borrowedBooks = new Book[5];
+        int borrowedCount = 0;
+        public Student(String firstName, String lastName, int studentNumber, String fieldOfStudy) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.studentNumber = studentNumber;
+            this.fieldOfStudy = fieldOfStudy;
+        }
+        void borrowBook(Book book) {
+            if (borrowedCount < borrowedBooks.length) {
+                borrowedBooks[borrowedCount++] = book;
+            }
+        }
+    }
     public static void main(String[] args) {
             Book[] books = {
                     new Book("Pride and Prejudice", "Jane Austen", 259, 1813),
