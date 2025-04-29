@@ -5,8 +5,8 @@ public class EX3_5 {
         EX3_4 circuit = new EX3_4();
         combinationTest(circuit, 0, 0);
         combinationTest(circuit, 0, 1);
-        combinationTest(circuit, 1, 1);
         combinationTest(circuit, 1, 0);
+        combinationTest(circuit, 1, 1);
     }
     public static void combinationTest(EX3_4 circuit, int firstSwitch, int secondSwitch) {
         setSwitchPositions(circuit, firstSwitch, secondSwitch);
