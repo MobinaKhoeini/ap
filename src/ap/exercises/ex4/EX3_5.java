@@ -1,4 +1,4 @@
-package ap.exercises.ex3;
+package ap.exercises.ex4;
 
 public class EX3_5 {
     public static void main(String[] args) {
