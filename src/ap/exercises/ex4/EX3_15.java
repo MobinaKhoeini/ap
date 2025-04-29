@@ -1,4 +1,4 @@
-package ap.exercises.ex3;
+package ap.exercises.ex4;
 
 public class EX3_15 {
     private String sender;
