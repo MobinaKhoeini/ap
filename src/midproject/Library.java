@@ -128,10 +128,12 @@ public class Library {
                                     }
                                     case 2: {
                                         requestBook();
+                                        fileHandeling.saveLibrary(library);
                                         break;
                                     }
                                     case 3: {
                                         requestDelivery();
+                                        fileHandeling.saveLibrary(library);
                                         break;
                                     }
                                     case 4: {
@@ -175,10 +177,12 @@ public class Library {
                                 }
                                 case 4: {
                                     acceptRequest();
+                                    fileHandeling.saveLibrary(library);
                                     break;
                                 }
                                 case 5: {
                                     acceptDeliveryRequest();
+                                    fileHandeling.saveLibrary(library);
                                     break;
                                 }
                                 case 6: {
