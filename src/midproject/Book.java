@@ -43,6 +43,7 @@ public class Book {
                 ", author='" + author + '\'' +
                 ", pageNumber=" + pageNumber +
                 ", publicationYear=" + publicationYear +
+                ", available=" + available +
                 '}';
     }
 }
