@@ -5,6 +5,13 @@ public class Menu {
     public void setUserType(String userType) {
         this.userType = userType;
     }
+    public void primaryMenu() {
+        System.out.println("please choose your role:");
+        System.out.println("1.Manager");
+        System.out.println("2.Student");
+        System.out.println("3.Employee");
+        System.out.println("4.Exit");
+    }
     public void managerMenu() {
         System.out.println("please choose your required function:");
         System.out.println("1.adding a new employee");
@@ -37,6 +44,8 @@ public class Menu {
         System.out.println("1.adding a book");
         System.out.println("2.completing information");
         System.out.println("3.changing information");
-        System.out.println("4.getting back");
+        System.out.println("4.accepting loan request(s)");
+        System.out.println("5.accepting delivery request(s)");
+        System.out.println("6.getting back");
     }
 }

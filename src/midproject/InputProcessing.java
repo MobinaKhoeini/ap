@@ -34,6 +34,11 @@ public class InputProcessing {
         String name = scanner.next();
         return name;
     }
+    public int searchStudent() {
+        System.out.println("please your student number:");
+        int studentNum = scanner.nextInt();
+        return studentNum;
+    }
     public Student studentLogin() {
         System.out.println("please input your information");
         System.out.println("your first name:");
@@ -70,6 +75,23 @@ public class InputProcessing {
         System.out.println("your last name:");
         String lastName = scanner.next();
         return lastName;
+    }
+    public int searchEmployee() {
+        System.out.println("your employee number:");
+        int empNum = scanner.nextInt();
+        return empNum;
+    }
+    public boolean acceptRequest() {
+        System.out.println("you accept the request? Y/N");
+        String choice = scanner.next();
+        if (choice.equalsIgnoreCase("Y")) {
+            return true;
+        }
+        return false;
+    }
+    public int getNum() {
+        int choice = scanner.nextInt();
+        return choice;
     }
 
 }
