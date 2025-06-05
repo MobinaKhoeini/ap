@@ -1,124 +1,149 @@
 package ap.exercises.ex6;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 
 public class DomainHtmlScraper {
-    private final String domainAddress;
-    private final Queue<String> queue;
-    private final Set<String> visitedUrls;
-    private final HtmlFileManager htmlFileManager;
-    private final List<String> allImageUrls;
-    private final String saveDirectory;
+    private final String mainDomain;
+    private final Queue<String> urlQueue = new LinkedList<>();
+    private final Set<String> visitedUrls = new HashSet<>();
+    private final List<String> allImageUrls = new ArrayList<>();
+    private final Path baseSavePath;
 
-    public DomainHtmlScraper(String domainAddress, String savePath) {
-        this.domainAddress = domainAddress;
-        this.queue = new LinkedList<>();
-        this.visitedUrls = new HashSet<>();
-        this.htmlFileManager = new HtmlFileManager(savePath);
-        this.allImageUrls = new ArrayList<>();
-        this.saveDirectory = savePath;
+    public DomainHtmlScraper(String domainAddress, String savePath) throws URISyntaxException, IOException {
+        URI uri = new URI(domainAddress);
+        this.mainDomain = uri.getHost();
+        this.baseSavePath = Paths.get(savePath);
+        Files.createDirectories(baseSavePath);
+
+        urlQueue.add(domainAddress);
+        visitedUrls.add(domainAddress);
     }
 
     public void start() throws IOException {
-        queue.add(domainAddress);
-        visitedUrls.add(domainAddress);
         int counter = 0;
 
-        while (!queue.isEmpty() && counter < 100) {
-            String url = queue.remove();
+        while (!urlQueue.isEmpty() && counter < 100) {
+            String currentUrl = urlQueue.remove();
             counter++;
 
             try {
-                List<String> htmlLines = HtmlFetcher.fetchHtml(url);
-                this.htmlFileManager.save(htmlLines);
+                System.out.printf("[%d] Processing: %s%n", counter, currentUrl);
 
 
-                List<String> imageUrls = extractImageUrls(htmlLines);
-                allImageUrls.addAll(imageUrls);
+                Path savePath = determineSavePath(currentUrl);
+                Files.createDirectories(savePath.getParent());
 
 
-                List<String> urls = extractUrls(htmlLines);
+                List<String> htmlLines = HtmlFetcher.fetchHtml(currentUrl);
+                saveHtmlContent(htmlLines, savePath);
 
-                for (String newUrl : urls) {
-                    if (!visitedUrls.contains(newUrl)) {
-                        String absoluteUrl = makeAbsoluteUrl(newUrl);
-                        if (absoluteUrl.startsWith(domainAddress)) {
-                            visitedUrls.add(absoluteUrl);
-                            queue.add(absoluteUrl);
-                        }
-                    }
-                }
 
-                System.out.println("[" + counter + "] " + url + " processed. Queue size: " + queue.size());
+                processLinks(htmlLines, currentUrl);
+
+                System.out.printf("Queue size: %d%n", urlQueue.size());
             } catch (Exception e) {
-                System.out.println("ERROR processing " + url + ": " + e.getMessage());
+                System.err.printf("Error processing %s: %s%n", currentUrl, e.getMessage());
             }
         }
 
-        saveImageUrlsToFile();
-        System.out.println("Operation complete. Total pages processed: " + counter);
+        saveImageUrls();
+        System.out.printf("Crawl complete. Processed %d pages.%n", counter);
     }
 
+    private Path determineSavePath(String url) throws URISyntaxException {
+        URI uri = new URI(url);
+        String path = uri.getPath();
+        String subdomain = getSubdomain(uri);
 
-    private List<String> extractUrls(List<String> htmlLines) {
-        List<String> urls = new ArrayList<>();
-        for (String line : htmlLines) {
-            String url = extractUrlFromLine(line);
-            if (url != null && !url.isEmpty()) {
-                urls.add(url);
+        Path savePath = baseSavePath;
+
+
+        if (!subdomain.isEmpty()) {
+            savePath = savePath.resolve("_" + subdomain);
+        }
+
+
+        if (path == null || path.isEmpty() || path.equals("/")) {
+            return savePath.resolve("index.html");
+        }
+
+
+        String filePath = path.startsWith("/") ? path.substring(1) : path;
+
+
+        if (path.endsWith("/")) {
+            return savePath.resolve(filePath).resolve("index.html");
+        }
+
+        return savePath.resolve(filePath);
+    }
+
+    private String getSubdomain(URI uri) {
+        String host = uri.getHost();
+        if (host == null || host.equals(mainDomain)) {
+            return "";
+        }
+
+        return host.substring(0, host.indexOf("." + mainDomain));
+    }
+
+    private void saveHtmlContent(List<String> htmlLines, Path savePath) throws IOException {
+
+        Files.createDirectories(savePath.getParent());
+
+        try (PrintWriter out = new PrintWriter(savePath.toFile(), "UTF-8")) {
+            for (String line : htmlLines) {
+                out.println(line);
             }
         }
-        return urls;
     }
 
-    private List<String> extractImageUrls(List<String> htmlLines) {
-        List<String> imageUrls = new ArrayList<>();
-        for (String line : htmlLines) {
-            String imageUrl = extractImageUrlFromLine(line);
-            if (imageUrl != null && !imageUrl.isEmpty()) {
-                imageUrls.add(imageUrl);
+    private void processLinks(List<String> htmlLines, String currentUrl) throws URISyntaxException {
+
+        List<String> imageUrls = HtmlParser.extractAllImageUrls(htmlLines);
+        allImageUrls.addAll(imageUrls);
+
+
+        for (String url : HtmlParser.extractAllUrls(htmlLines)) {
+            if (!visitedUrls.contains(url)) {
+                String absoluteUrl = toAbsoluteUrl(url, currentUrl);
+                if (isSameDomain(absoluteUrl)) {
+                    visitedUrls.add(absoluteUrl);
+                    urlQueue.add(absoluteUrl);
+                }
             }
         }
-        return imageUrls;
     }
 
-    private String extractUrlFromLine(String line) {
-        return extractAttribute(line, "href=\"");
-    }
-
-    private String extractImageUrlFromLine(String line) {
-        return extractAttribute(line, "src=\"");
-    }
-
-    private String extractAttribute(String line, String attribute) {
-        int start = line.indexOf(attribute);
-        if (start < 0) return null;
-
-        start += attribute.length();
-        int end = line.indexOf("\"", start);
-        if (end < 0) return null;
-
-        return line.substring(start, end);
-    }
-
-    private String makeAbsoluteUrl(String url) {
+    private String toAbsoluteUrl(String url, String baseUrl) throws URISyntaxException {
         if (url.startsWith("http")) {
             return url;
         }
-        return domainAddress + (url.startsWith("/") ? url : "/" + url);
+
+        URI baseUri = new URI(baseUrl);
+        if (url.startsWith("/")) {
+            return baseUri.getScheme() + "://" + baseUri.getHost() + url;
+        }
+
+        return baseUrl + (baseUrl.endsWith("/") ? "" : "/") + url;
     }
 
-    private void saveImageUrlsToFile() {
-        try {
-            Path imageUrlsPath = Paths.get(saveDirectory, "image_urls.txt");
-            Files.write(imageUrlsPath, allImageUrls);
-            System.out.println("Image URLs saved to: " + imageUrlsPath);
-        } catch (IOException e) {
-            System.err.println("Failed to save image URLs: " + e.getMessage());
-        }
+    private boolean isSameDomain(String url) throws URISyntaxException {
+        URI uri = new URI(url);
+        String host = uri.getHost();
+        return host != null && (host.equals(mainDomain) || host.endsWith("." + mainDomain));
+    }
+
+    private void saveImageUrls() throws IOException {
+        Path imageListPath = baseSavePath.resolve("image_urls.txt");
+        Files.write(imageListPath, allImageUrls);
     }
 }

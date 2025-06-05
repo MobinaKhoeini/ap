@@ -18,9 +18,9 @@ public class HtmlAnalyzer {
                 .map(FileTools::getTextFileLines)
                 .filter(Objects::nonNull)
                 .flatMap(List::stream)
-                .map(HtmlParser::extractFirstUrl)
+                .map(line -> HtmlParser.extractUrl(line))
                 .filter(Objects::nonNull)
-                .filter(url -> url.length() > 0)
+                .filter(url -> !url.isEmpty())
                 .collect(Collectors.toList());
     }
 
