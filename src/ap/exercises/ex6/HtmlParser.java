@@ -2,8 +2,14 @@ package ap.exercises.ex6;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HtmlParser {
+    private static final Pattern AUDIO_PATTERN = Pattern.compile(
+            "(https?://[^\\s\"']+\\.(mp3|wav|ogg|m4a))",
+            Pattern.CASE_INSENSITIVE
+    );
 
     public static List<String> extractAllUrls(List<String> htmlLines) {
         List<String> urls = new ArrayList<>();
@@ -25,6 +31,16 @@ public class HtmlParser {
             }
         }
         return imageUrls;
+    }
+    public static List<String> extractAllAudioUrls(List<String> htmlLines) {
+        List<String> audioUrls = new ArrayList<>();
+        for (String line : htmlLines) {
+            Matcher matcher = AUDIO_PATTERN.matcher(line);
+            while (matcher.find()) {
+                audioUrls.add(matcher.group(1));
+            }
+        }
+        return audioUrls;
     }
 
     public static String extractUrl(String line) {
