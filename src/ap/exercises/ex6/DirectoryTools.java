@@ -54,12 +54,6 @@ public final class DirectoryTools {
         return finalPath;
     }
 
-    /**
-     * Gets all regular files (non-directories) in the specified directory
-     * @param directoryPath Path to the directory to scan
-     * @return List of File objects for each file in the directory
-     * @throws IllegalArgumentException if the path is not a directory
-     */
     public static List<File> getFilesInDirectory(String directoryPath) {
         File dir = new File(directoryPath);
 
@@ -83,7 +77,7 @@ public final class DirectoryTools {
 
 
     public static List<String> getFilesAbsolutePathInDirectory(String directoryPath) {
-        return ap.exercises.ex5.DirectoryTools.getFilesInDirectory(directoryPath).stream()
+        return ap.exercises.ex6.DirectoryTools.getFilesInDirectory(directoryPath).stream()
                 .map(s -> s.getAbsolutePath())
                 .collect(Collectors.toList());
     }

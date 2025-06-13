@@ -11,16 +11,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class DomainHtmlScraper {
     private final String mainDomain;
-    private final Queue<String> urlQueue = new LinkedList<>();
-    private final Set<String> visitedUrls = new HashSet<>();
-    private final List<String> allImageUrls = new ArrayList<>();
+    private final Queue<String> urlQueue = new ConcurrentLinkedQueue<>();
+    private final Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
+    private final List<String> allImageUrls = Collections.synchronizedList(new ArrayList<>());
     private final Path baseSavePath;
     private final Path imagesPath;
     private final Path songsPath;
+    private final ExecutorService executorService;
+    private final int threadCount;
+    private final CountDownLatch completionLatch;
 
     public DomainHtmlScraper(String domainAddress, String savePath) throws URISyntaxException, IOException {
         URI uri = new URI(domainAddress);
@@ -28,6 +31,10 @@ public class DomainHtmlScraper {
         this.baseSavePath = Paths.get(savePath, "html");
         this.imagesPath = Paths.get(savePath, "images");
         this.songsPath = Paths.get(savePath, "songs");
+
+        this.threadCount = Conf.THREAD_COUNT > 0 ? Conf.THREAD_COUNT : 1;
+        this.executorService = Executors.newFixedThreadPool(threadCount);
+        this.completionLatch = new CountDownLatch(threadCount);
 
         Files.createDirectories(baseSavePath);
         Files.createDirectories(imagesPath);
@@ -38,43 +45,69 @@ public class DomainHtmlScraper {
     }
 
     public void start() throws IOException, InterruptedException {
-        int counter = 0;
+        if (threadCount > 1) {
 
-        while (!urlQueue.isEmpty() && counter < 100) {
-            String currentUrl = urlQueue.remove();
-            counter++;
+            for (int i = 0; i < threadCount; i++) {
+                executorService.submit(new CrawlerTask());
+            }
+            completionLatch.await();
+            executorService.shutdown();
+        } else {
 
-            try {
-
-                TimeUnit.SECONDS.sleep(Conf.DOWNLOAD_DELAY_SECONDS);
-
-                System.out.printf("[%d] Processing: %s%n", counter, currentUrl);
-
-                Path savePath = determineSavePath(currentUrl);
-                Files.createDirectories(savePath.getParent());
-
-                List<String> htmlLines = HtmlFetcher.fetchHtml(currentUrl);
-                saveHtmlContent(htmlLines, savePath);
-
-
-                processResources(htmlLines, currentUrl);
-
-                System.out.printf("Queue size: %d%n", urlQueue.size());
-            } catch (Exception e) {
-                System.err.printf("Error processing %s: %s%n", currentUrl, e.getMessage());
+            int counter = 0;
+            while (!urlQueue.isEmpty() && counter < 100) {
+                processNextUrl();
+                counter++;
             }
         }
-        System.out.printf("Crawl complete. Processed %d pages.%n", counter);
+        System.out.printf("Crawl complete. Processed %d pages.%n", visitedUrls.size());
     }
-    private void processResources(List<String> htmlLines, String baseUrl) throws URISyntaxException, IOException {
 
+    private class CrawlerTask implements Runnable {
+        @Override
+        public void run() {
+            try {
+                while (!urlQueue.isEmpty()) {
+                    processNextUrl();
+                }
+            } finally {
+                completionLatch.countDown();
+            }
+        }
+    }
+
+    private void processNextUrl() {
+        String currentUrl = urlQueue.poll();
+        if (currentUrl == null) {
+            return;
+        }
+
+        try {
+            TimeUnit.SECONDS.sleep(Conf.DOWNLOAD_DELAY_SECONDS);
+
+            System.out.printf("[Thread-%d] Processing: %s%n", Thread.currentThread().getId(), currentUrl);
+
+            Path savePath = determineSavePath(currentUrl);
+            Files.createDirectories(savePath.getParent());
+
+            List<String> htmlLines = HtmlFetcher.fetchHtml(currentUrl);
+            saveHtmlContent(htmlLines, savePath);
+
+            processResources(htmlLines, currentUrl);
+
+            System.out.printf("Queue size: %d%n", urlQueue.size());
+        } catch (Exception e) {
+            System.err.printf("Error processing %s: %s%n", currentUrl, e.getMessage());
+        }
+    }
+
+
+    private void processResources(List<String> htmlLines, String baseUrl) throws URISyntaxException, IOException {
         List<String> imageUrls = HtmlParser.extractAllImageUrls(htmlLines);
         downloadResources(imageUrls, imagesPath, baseUrl);
 
-
         List<String> audioUrls = HtmlParser.extractAllAudioUrls(htmlLines);
         downloadResources(audioUrls, songsPath, baseUrl);
-
 
         for (String url : HtmlParser.extractAllUrls(htmlLines)) {
             if (!visitedUrls.contains(url)) {
@@ -94,19 +127,15 @@ public class DomainHtmlScraper {
 
         Path savePath = baseSavePath;
 
-
         if (!subdomain.isEmpty()) {
             savePath = savePath.resolve("_" + subdomain);
         }
-
 
         if (path == null || path.isEmpty() || path.equals("/")) {
             return savePath.resolve("index.html");
         }
 
-
         String filePath = path.startsWith("/") ? path.substring(1) : path;
-
 
         if (path.endsWith("/")) {
             return savePath.resolve(filePath).resolve("index.html");
@@ -114,6 +143,7 @@ public class DomainHtmlScraper {
 
         return savePath.resolve(filePath);
     }
+
     private void downloadResources(List<String> urls, Path targetDir, String baseUrl)
             throws URISyntaxException, IOException {
         for (String url : urls) {
@@ -134,6 +164,7 @@ public class DomainHtmlScraper {
             }
         }
     }
+
     private String getFileNameFromUrl(String url) {
         return url.substring(url.lastIndexOf('/') + 1);
     }
@@ -148,29 +179,11 @@ public class DomainHtmlScraper {
     }
 
     private void saveHtmlContent(List<String> htmlLines, Path savePath) throws IOException {
-
         Files.createDirectories(savePath.getParent());
 
         try (PrintWriter out = new PrintWriter(savePath.toFile(), "UTF-8")) {
             for (String line : htmlLines) {
                 out.println(line);
-            }
-        }
-    }
-
-    private void processLinks(List<String> htmlLines, String currentUrl) throws URISyntaxException {
-
-        List<String> imageUrls = HtmlParser.extractAllImageUrls(htmlLines);
-        allImageUrls.addAll(imageUrls);
-
-
-        for (String url : HtmlParser.extractAllUrls(htmlLines)) {
-            if (!visitedUrls.contains(url)) {
-                String absoluteUrl = toAbsoluteUrl(url, currentUrl);
-                if (isSameDomain(absoluteUrl)) {
-                    visitedUrls.add(absoluteUrl);
-                    urlQueue.add(absoluteUrl);
-                }
             }
         }
     }
@@ -192,10 +205,5 @@ public class DomainHtmlScraper {
         URI uri = new URI(url);
         String host = uri.getHost();
         return host != null && (host.equals(mainDomain) || host.endsWith("." + mainDomain));
-    }
-
-    private void saveImageUrls() throws IOException {
-        Path imageListPath = baseSavePath.resolve("image_urls.txt");
-        Files.write(imageListPath, allImageUrls);
     }
 }
