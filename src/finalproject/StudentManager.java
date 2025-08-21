@@ -7,7 +7,7 @@ public class StudentManager {
     private List<Student> students;
 
     public StudentManager() {
-        this.students = new ArrayList<>();
+        this.students = FileManager.loadStudents();
     }
 
     public void registerStudent(String name, String studentId, String username, String password) {
@@ -51,4 +51,3 @@ public class StudentManager {
         return students.size();
     }
 }
-
