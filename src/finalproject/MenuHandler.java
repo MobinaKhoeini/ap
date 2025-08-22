@@ -1,5 +1,6 @@
 package finalproject;
 
+
 import java.util.Scanner;
 public class MenuHandler {
     private Scanner scanner;
@@ -93,8 +94,9 @@ public class MenuHandler {
             System.out.println("3. Borrow a Book");
             System.out.println("4. Return a Book");
             System.out.println("5. View Available Books");
-            System.out.println("6. search books");
-            System.out.println("7. Logout");
+            System.out.println("6. Search Books");
+            System.out.println("7. View My loans");
+            System.out.println("8. Logout");
             System.out.print("Please enter your choice: ");
 
             int choice = getIntInput(1, 7);
@@ -120,6 +122,8 @@ public class MenuHandler {
                     librarySystem.searchBooks();
                     break;
                 case 7:
+                    librarySystem.viewMyLoans(currentUser);
+                case 8:
                     currentUser = null;
                     System.out.println("Logged out successfully.");
                     return;
@@ -143,4 +147,3 @@ public class MenuHandler {
         }
     }
 }
-

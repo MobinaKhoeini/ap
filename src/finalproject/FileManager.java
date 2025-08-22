@@ -6,6 +6,7 @@ import java.util.List;
 public class FileManager {
     private static final String STUDENT_FILE = "D:/savingLibrary.txt";
     private static final String BOOK_FILE = "D:/savingBooks.txt";
+    private static final String LOAN_FILE = "D:/savingloans.txt";
 
     public static void saveStudents(List<Student> students) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(STUDENT_FILE))) {
@@ -59,7 +60,7 @@ public class FileManager {
         File file = new File(BOOK_FILE);
 
         if (!file.exists()) {
-            System.out.println("no existing file.");
+            System.out.println("no books existing");
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(BOOK_FILE))) {
@@ -75,7 +76,38 @@ public class FileManager {
         }
 
         return books;
+    }
 
+    public static void saveLoans(List<Loan> loans) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(LOAN_FILE))) {
+            for (Loan loan : loans) {
+                writer.println(loan.toFileString());
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving loan data: " + e.getMessage());
+        }
+    }
 
+    public static List<Loan> loadLoans() {
+        List<Loan> loans = new java.util.ArrayList<>();
+        File file = new File(LOAN_FILE);
+
+        if (!file.exists()) {
+            return loans;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(LOAN_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Loan loan = Loan.fromFileString(line);
+                if (loan != null) {
+                    loans.add(loan);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading loan data: " + e.getMessage());
+        }
+
+        return loans;
     }
 }

@@ -35,5 +35,8 @@ public class BookManager {
             System.out.println(book);
         }
     }
-}
 
+    public List<Book> getAllBooks() {
+        return books;
+    }
+}

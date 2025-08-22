@@ -21,6 +21,8 @@ public class Book {
     public String getIsbn() { return isbn; }
     public boolean isAvailable() { return isAvailable; }
 
+    public void setAvailable(boolean available) { isAvailable = available; }
+
     public String toFileString() {
         return title + "|" + author + "|" + publicationYear + "|" + isbn + "|" + isAvailable;
     }
@@ -41,5 +43,4 @@ public class Book {
                 " | ISBN: " + isbn +
                 " | Status: " + (isAvailable ? "Available" : "Borrowed");
     }
-
 }
