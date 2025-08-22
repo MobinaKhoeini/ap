@@ -93,10 +93,11 @@ public class MenuHandler {
             System.out.println("3. Borrow a Book");
             System.out.println("4. Return a Book");
             System.out.println("5. View Available Books");
-            System.out.println("6. Logout");
+            System.out.println("6. search books");
+            System.out.println("7. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 6);
+            int choice = getIntInput(1, 7);
 
             switch (choice) {
                 case 1:
@@ -116,6 +117,9 @@ public class MenuHandler {
                     librarySystem.displayAvailableBooks();
                     break;
                 case 6:
+                    librarySystem.searchBooks();
+                    break;
+                case 7:
                     currentUser = null;
                     System.out.println("Logged out successfully.");
                     return;
