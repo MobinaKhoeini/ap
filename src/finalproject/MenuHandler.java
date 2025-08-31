@@ -70,22 +70,33 @@ public class MenuHandler {
         while (true) {
             System.out.println("\n=== Guest Menu ===");
             System.out.println("1. View Registered Student Count");
-            System.out.println("2. Back to Main Menu");
+            System.out.println("2. Search Books");
+            System.out.println("3. Back to Main Menu");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 2);
+            int choice = getIntInput(1, 3);
 
             switch (choice) {
                 case 1:
                     displayStudentCount();
                     break;
                 case 2:
+                    guestBookSearch();
+                case 3:
                     System.out.println("Returning to main menu...");
                     return;
                 default:
                     System.out.println("Invalid option! Please try again.");
             }
         }
+    }
+
+    private void guestBookSearch() {
+        System.out.println("\n--- Search Books by Title ---");
+        System.out.print("Enter book title: ");
+        String title = scanner.nextLine();
+
+        librarySystem.searchBooksByTitleForGuest(title);
     }
 
     private void displayStudentCount() {

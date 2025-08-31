@@ -109,6 +109,22 @@ public class LibrarySystem {
             }
         }
     }
+    public void searchBooksByTitleForGuest(String title) {
+        List<Book> results = bookManager.searchBooks(title, null, null);
+
+        System.out.println("\n--- Search Results ---");
+        if (results.isEmpty()) {
+            System.out.println("No books found titled: " + title);
+        } else {
+            for (Book book : results) {
+
+                System.out.println("Title: " + book.getTitle() +
+                        " | Author: " + book.getAuthor() +
+                        " | Year: " + book.getPublicationYear() +
+                        " | ISBN: " + book.getIsbn());
+            }
+        }
+    }
 
     public void viewMyLoans(Student student) {
         System.out.println("\n--- My Loans ---");
@@ -132,4 +148,5 @@ public class LibrarySystem {
         LibrarySystem system = new LibrarySystem();
         system.start();
     }
+
 }
