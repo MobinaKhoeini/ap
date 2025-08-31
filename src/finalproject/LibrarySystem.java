@@ -12,6 +12,8 @@ public class LibrarySystem {
     private MenuHandler menuHandler;
     private Scanner scanner;
 
+    private static final int UNIVERSITY_STUDENT_COUNT = 5000;
+
     public LibrarySystem() {
         this.studentManager = new StudentManager();
         this.bookManager = new BookManager();
@@ -22,6 +24,21 @@ public class LibrarySystem {
 
     public int getStudentCount() {
         return this.studentManager.getStudentCount();
+    }
+    public int getUniversityStudentCount() {
+        return UNIVERSITY_STUDENT_COUNT;
+    }
+
+    public int getTotalBooksCount() {
+        return bookManager.getAllBooks().size();
+    }
+
+    public int getTotalLoansCount() {
+        return loanManager.getAllLoans().size();
+    }
+
+    public int getActiveLoansCount() {
+        return loanManager.getActiveLoans().size();
     }
 
     public void registerStudent(String name, String studentId, String username, String password) {

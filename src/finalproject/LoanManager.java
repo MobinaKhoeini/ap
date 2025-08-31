@@ -15,7 +15,7 @@ public class LoanManager {
     }
 
     public boolean borrowBook(String studentUsername, String bookIsbn, LocalDate startDate, LocalDate endDate) {
-        List<Book> books = bookManager.searchBooks(null, null, null);
+        List<Book> books = bookManager.getAllBooks();
         Book targetBook = books.stream()
                 .filter(b -> b.getIsbn().equals(bookIsbn) && b.isAvailable())
                 .findFirst()
@@ -25,6 +25,7 @@ public class LoanManager {
             System.out.println("Book not available or not found.");
             return false;
         }
+
         boolean hasActiveLoan = loans.stream()
                 .anyMatch(loan -> loan.getStudentUsername().equals(studentUsername) &&
                         loan.getBookIsbn().equals(bookIsbn) &&
@@ -34,6 +35,7 @@ public class LoanManager {
             System.out.println("You already have an active loan for this book.");
             return false;
         }
+
         Loan newLoan = new Loan(studentUsername, bookIsbn, startDate, endDate);
         loans.add(newLoan);
         targetBook.setAvailable(false);
@@ -56,8 +58,9 @@ public class LoanManager {
             System.out.println("No active loan found for this book.");
             return false;
         }
+
         activeLoan.setActive(false);
-        List<Book> books = bookManager.searchBooks(null, null, null);
+        List<Book> books = bookManager.getAllBooks();
         Book targetBook = books.stream()
                 .filter(b -> b.getIsbn().equals(bookIsbn))
                 .findFirst()
@@ -83,6 +86,10 @@ public class LoanManager {
         return loans.stream()
                 .filter(Loan::isActive)
                 .collect(Collectors.toList());
+    }
+
+    public List<Loan> getAllLoans() {
+        return new ArrayList<>(loans);
     }
 
     public void saveLoans() {

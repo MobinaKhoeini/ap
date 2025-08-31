@@ -71,7 +71,8 @@ public class MenuHandler {
             System.out.println("\n=== Guest Menu ===");
             System.out.println("1. View Registered Student Count");
             System.out.println("2. Search Books");
-            System.out.println("3. Back to Main Menu");
+            System.out.println("3. View Library Statistics");
+            System.out.println("4. Back to Main Menu");
             System.out.print("Please enter your choice: ");
 
             int choice = getIntInput(1, 3);
@@ -83,6 +84,9 @@ public class MenuHandler {
                 case 2:
                     guestBookSearch();
                 case 3:
+                    displayLibraryStatistics();
+                    break;
+                case 4:
                     System.out.println("Returning to main menu...");
                     return;
                 default:
@@ -102,6 +106,13 @@ public class MenuHandler {
     private void displayStudentCount() {
         int studentCount = librarySystem.getStudentCount();
         System.out.println("Total registered students: " + studentCount);
+    }
+    private void displayLibraryStatistics() {
+        System.out.println("\n--- Library Statistics ---");
+        System.out.println("Total students in university: " + librarySystem.getUniversityStudentCount());
+        System.out.println("Total books: " + librarySystem.getTotalBooksCount());
+        System.out.println("Total loans: " + librarySystem.getTotalLoansCount());
+        System.out.println("number of lately borrowed books: " + librarySystem.getActiveLoansCount());
     }
 
     private void handleStudentRegistration() {
