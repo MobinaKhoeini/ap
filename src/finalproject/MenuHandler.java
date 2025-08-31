@@ -2,6 +2,7 @@ package finalproject;
 
 
 import java.util.Scanner;
+
 public class MenuHandler {
     private Scanner scanner;
     private LibrarySystem librarySystem;
@@ -16,25 +17,21 @@ public class MenuHandler {
     public void displayMainMenu() {
         while (true) {
             System.out.println("\n=== University Library Management System ===");
-            System.out.println("1. Student Registration");
-            System.out.println("2. Student Login");
-            System.out.println("3. View Registered Student Count");
-            System.out.println("4. Exit");
+            System.out.println("1. Enter as Student");
+            System.out.println("2. Enter as Guest");
+            System.out.println("3. Exit");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 5);
+            int choice = getIntInput(1, 3);
 
             switch (choice) {
                 case 1:
-                    handleStudentRegistration();
+                    displayStudentAccessMenu();
                     break;
                 case 2:
-                    handleStudentLogin();
+                    displayGuestMenu();
                     break;
                 case 3:
-                    displayStudentCount();
-                    break;
-                case 4:
                     System.out.println("Exiting system. Goodbye!");
                     return;
                 default:
@@ -44,9 +41,56 @@ public class MenuHandler {
         }
     }
 
+    private void displayStudentAccessMenu() {
+        while (true) {
+            System.out.println("\n=== Student Access ===");
+            System.out.println("1. Student Registration");
+            System.out.println("2. Student Login");
+            System.out.println("3. Back to Main Menu");
+            System.out.print("Please enter your choice: ");
+
+            int choice = getIntInput(1, 3);
+
+            switch (choice) {
+                case 1:
+                    handleStudentRegistration();
+                    break;
+                case 2:
+                    handleStudentLogin();
+                    break;
+                case 3:
+                    return;
+                default:
+                    System.out.println("Invalid option! Please try again.");
+            }
+        }
+    }
+    private void displayGuestMenu() {
+
+        while (true) {
+            System.out.println("\n=== Guest Menu ===");
+            System.out.println("1. View Registered Student Count");
+            System.out.println("2. Back to Main Menu");
+            System.out.print("Please enter your choice: ");
+
+            int choice = getIntInput(1, 2);
+
+            switch (choice) {
+                case 1:
+                    displayStudentCount();
+                    break;
+                case 2:
+                    System.out.println("Returning to main menu...");
+                    return;
+                default:
+                    System.out.println("Invalid option! Please try again.");
+            }
+        }
+    }
+
     private void displayStudentCount() {
         int studentCount = librarySystem.getStudentCount();
-        System.out.println("\nTotal registered students: " + studentCount);
+        System.out.println("Total registered students: " + studentCount);
     }
 
     private void handleStudentRegistration() {
@@ -95,11 +139,11 @@ public class MenuHandler {
             System.out.println("4. Return a Book");
             System.out.println("5. View Available Books");
             System.out.println("6. Search Books");
-            System.out.println("7. View My loans");
+            System.out.println("7. View My Loans");
             System.out.println("8. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 7);
+            int choice = getIntInput(1, 9);
 
             switch (choice) {
                 case 1:
@@ -123,6 +167,7 @@ public class MenuHandler {
                     break;
                 case 7:
                     librarySystem.viewMyLoans(currentUser);
+                    break;
                 case 8:
                     currentUser = null;
                     System.out.println("Logged out successfully.");
