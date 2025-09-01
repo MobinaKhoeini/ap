@@ -28,6 +28,9 @@ public class LibrarySystem {
     public boolean authenticateManager(String username, String password) {
         return MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password);
     }
+    public Employee authenticateEmployee(String username, String password) {
+        return employeeManager.authenticateEmployee(username, password);
+    }
     public void registerEmployee(String username, String password) {
         employeeManager.registerEmployee(username, password);
     }

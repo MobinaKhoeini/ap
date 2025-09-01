@@ -7,12 +7,14 @@ public class MenuHandler {
     private LibrarySystem librarySystem;
     private Student currentUser;
     private boolean isManagerLoggedIn = false;
+    private Employee currentEmployee;
 
     public MenuHandler(LibrarySystem librarySystem) {
         this.scanner = new Scanner(System.in);
         this.librarySystem = librarySystem;
         this.currentUser = null;
         this.isManagerLoggedIn = false;
+        this.currentEmployee = null;
     }
 
     public void displayMainMenu() {
@@ -21,10 +23,11 @@ public class MenuHandler {
             System.out.println("1. Enter as Student");
             System.out.println("2. Enter as Guest");
             System.out.println("3. Enter as Manager");
-            System.out.println("4. Exit");
+            System.out.println("4. Enter as Employee");
+            System.out.println("5. Exit");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 3);
+            int choice = getIntInput(1, 4);
 
             switch (choice) {
                 case 1:
@@ -37,6 +40,9 @@ public class MenuHandler {
                     displayManagerMenu();
                     break;
                 case 4:
+                    displayEmployeeAccessMenu();
+                    break;
+                case 5:
                     System.out.println("Exiting system. Goodbye!");
                     return;
                 default:
@@ -92,6 +98,27 @@ public class MenuHandler {
                     displayLibraryStatistics();
                     break;
                 case 4:
+                    System.out.println("Returning to main menu...");
+                    return;
+                default:
+                    System.out.println("Invalid option! Please try again.");
+            }
+        }
+    }
+    private void displayEmployeeAccessMenu() {
+        while (true) {
+            System.out.println("\n=== Employee Access ===");
+            System.out.println("1. Login");
+            System.out.println("2. Back to Main Menu");
+            System.out.print("Please enter your choice: ");
+
+            int choice = getIntInput(1, 2);
+
+            switch (choice) {
+                case 1:
+                    handleEmployeeLogin();
+                    break;
+                case 2:
                     System.out.println("Returning to main menu...");
                     return;
                 default:
@@ -165,6 +192,42 @@ public class MenuHandler {
 
         librarySystem.registerEmployee(username, password);
         System.out.println("Employee registered successfully!");
+    }
+    private void handleEmployeeLogin() {
+        System.out.println("\n--- Employee Login ---");
+
+        System.out.print("Username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        currentEmployee = librarySystem.authenticateEmployee(username, password);
+
+        if (currentEmployee != null) {
+            System.out.println("Login successful! Welcome, " + currentEmployee.getUsername());
+            displayLoggedInEmployeeMenu();
+        } else {
+            System.out.println("Invalid username or password.");
+        }
+    }
+    private void displayLoggedInEmployeeMenu() {
+        while (currentEmployee != null) {
+            System.out.println("\n=== Employee Dashboard ===");
+            System.out.println("1. Logout");
+            System.out.print("Please enter your choice: ");
+
+            int choice = getIntInput(1, 1);
+
+            switch (choice) {
+                case 1:
+                    currentEmployee = null;
+                    System.out.println("Logged out successfully.");
+                    return;
+                default:
+                    System.out.println("Invalid option! Please try again.");
+            }
+        }
     }
 
     private void guestBookSearch() {
