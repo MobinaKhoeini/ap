@@ -1,17 +1,18 @@
 package finalproject;
 
-
 import java.util.Scanner;
 
 public class MenuHandler {
     private Scanner scanner;
     private LibrarySystem librarySystem;
     private Student currentUser;
+    private boolean isManagerLoggedIn = false;
 
     public MenuHandler(LibrarySystem librarySystem) {
         this.scanner = new Scanner(System.in);
         this.librarySystem = librarySystem;
         this.currentUser = null;
+        this.isManagerLoggedIn = false;
     }
 
     public void displayMainMenu() {
@@ -19,7 +20,8 @@ public class MenuHandler {
             System.out.println("\n=== University Library Management System ===");
             System.out.println("1. Enter as Student");
             System.out.println("2. Enter as Guest");
-            System.out.println("3. Exit");
+            System.out.println("3. Enter as Manager");
+            System.out.println("4. Exit");
             System.out.print("Please enter your choice: ");
 
             int choice = getIntInput(1, 3);
@@ -32,6 +34,9 @@ public class MenuHandler {
                     displayGuestMenu();
                     break;
                 case 3:
+                    displayManagerMenu();
+                    break;
+                case 4:
                     System.out.println("Exiting system. Goodbye!");
                     return;
                 default:
@@ -93,6 +98,73 @@ public class MenuHandler {
                     System.out.println("Invalid option! Please try again.");
             }
         }
+    }
+    private void displayManagerMenu() {
+        System.out.println("\n=== Manager Access ===");
+        System.out.println("1. Login");
+        System.out.println("2. Back to Main Menu");
+        System.out.print("Please enter your choice: ");
+
+        int choice = getIntInput(1, 2);
+
+        switch (choice) {
+            case 1:
+                handleManagerLogin();
+                break;
+            case 2:
+                System.out.println("Returning to main menu...");
+                return;
+            default:
+                System.out.println("Invalid option! Please try again.");
+        }
+    }
+    private void handleManagerLogin() {
+        System.out.println("\n--- Manager Login ---");
+
+        System.out.print("Username: (admin) ");
+        String username = scanner.nextLine();
+
+        System.out.print("Password: (123) ");
+        String password = scanner.nextLine();
+        if (librarySystem.authenticateManager(username, password)) {
+            System.out.println("Login successful! Welcome, Manager.");
+            isManagerLoggedIn = true;
+            displayLoggedInManagerMenu();
+        } else {
+            System.out.println("Invalid username or password.");
+        }
+    }
+    private void displayLoggedInManagerMenu() {
+        System.out.println("\n=== Manager Dashboard ===");
+        System.out.println("1. Register New Employee");
+        System.out.println("2. Logout");
+        System.out.print("Please enter your choice: ");
+
+        int choice = getIntInput(1, 2);
+
+        switch (choice) {
+            case 1:
+                handleEmployeeRegistration();
+                break;
+            case 2:
+                isManagerLoggedIn = false;
+                System.out.println("Logged out successfully.");
+                return;
+            default:
+                System.out.println("Invalid option! Please try again.");
+        }
+    }
+    private void handleEmployeeRegistration() {
+        System.out.println("\n--- New Employee Registration ---");
+
+        System.out.print("Username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        librarySystem.registerEmployee(username, password);
+        System.out.println("Employee registered successfully!");
     }
 
     private void guestBookSearch() {

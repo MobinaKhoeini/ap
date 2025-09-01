@@ -7,6 +7,7 @@ public class FileManager {
     private static final String STUDENT_FILE = "D:/savingLibrary.txt";
     private static final String BOOK_FILE = "D:/savingBooks.txt";
     private static final String LOAN_FILE = "D:/savingloans.txt";
+    private static final String EMPLOYEE_FILE= "D:/savingEmployees.txt";
 
     public static void saveStudents(List<Student> students) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(STUDENT_FILE))) {
@@ -109,5 +110,37 @@ public class FileManager {
         }
 
         return loans;
+    }
+    public static void saveEmployees(List<Employee> employees) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(EMPLOYEE_FILE))) {
+            for (Employee employee : employees) {
+                writer.println(employee.toFileString());
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving employee data: " + e.getMessage());
+        }
+    }
+    public static List<Employee> loadEmployees() {
+        List<Employee> employees = new java.util.ArrayList<>();
+        File file = new File(EMPLOYEE_FILE);
+
+        if (!file.exists()) {
+            saveEmployees(employees);
+            return employees;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(EMPLOYEE_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Employee employee = Employee.fromFileString(line);
+                if (employee != null) {
+                    employees.add(employee);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading employee data: " + e.getMessage());
+        }
+
+        return employees;
     }
 }

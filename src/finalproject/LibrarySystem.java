@@ -9,17 +9,27 @@ public class LibrarySystem {
     private StudentManager studentManager;
     private BookManager bookManager;
     private LoanManager loanManager;
+    private EmployeeManager employeeManager;
     private MenuHandler menuHandler;
     private Scanner scanner;
 
     private static final int UNIVERSITY_STUDENT_COUNT = 5000;
+    private static final String MANAGER_USERNAME = "admin";
+    private static final String MANAGER_PASSWORD = "123";
 
     public LibrarySystem() {
         this.studentManager = new StudentManager();
         this.bookManager = new BookManager();
         this.loanManager = new LoanManager(bookManager);
+        this.employeeManager = new EmployeeManager();
         this.menuHandler = new MenuHandler(this);
         this.scanner = new Scanner(System.in);
+    }
+    public boolean authenticateManager(String username, String password) {
+        return MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password);
+    }
+    public void registerEmployee(String username, String password) {
+        employeeManager.registerEmployee(username, password);
     }
 
     public int getStudentCount() {
