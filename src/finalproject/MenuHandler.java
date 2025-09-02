@@ -214,17 +214,21 @@ public class MenuHandler {
     private void displayLoggedInEmployeeMenu() {
         while (currentEmployee != null) {
             System.out.println("\n=== Employee Dashboard ===");
-            System.out.println("1. Change Password");
-            System.out.println("2. Logout");
+            System.out.println("1. Add New Book");
+            System.out.println("2. Change Password");
+            System.out.println("3. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 2);
+            int choice = getIntInput(1, 3);
 
             switch (choice) {
                 case 1:
-                    handleChangePassword();
+                    handleAddNewBook();
                     break;
                 case 2:
+                    handleChangePassword();
+                    break;
+                case 3:
                     currentEmployee = null;
                     System.out.println("Logged out successfully.");
                     return;
@@ -232,6 +236,24 @@ public class MenuHandler {
                     System.out.println("Invalid option! Please try again.");
             }
         }
+    }
+    private void handleAddNewBook() {
+        System.out.println("\n--- Add New Book ---");
+
+        System.out.print("Title: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Author: ");
+        String author = scanner.nextLine();
+
+        System.out.print("Publication Year: ");
+        int year = getIntInput(1000, 9999);
+
+        System.out.print("ISBN: ");
+        String isbn = scanner.nextLine();
+
+        librarySystem.addBook(title, author, year, isbn);
+
     }
     private void handleChangePassword() {
         System.out.println("\n--- Change Password ---");

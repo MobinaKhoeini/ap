@@ -19,7 +19,21 @@ public class BookManager {
                 )
                 .collect(Collectors.toList());
     }
+    public void addBook(String title, String author, int publicationYear, String isbn) {
+        if (isIsbnTaken(isbn)) {
+            System.out.println("This ISBN already exists. Please enter another one.");
+            return;
+        }
 
+        Book newBook = new Book(title, author, publicationYear, isbn, true);
+        books.add(newBook);
+        FileManager.saveBooks(books);
+        System.out.println("Book added successfully!");
+    }
+
+    private boolean isIsbnTaken(String isbn) {
+        return books.stream().anyMatch(b -> b.getIsbn().equals(isbn));
+    }
     public void displayAvailableBooks() {
         List<Book> availableBooks = books.stream()
                 .filter(Book::isAvailable)

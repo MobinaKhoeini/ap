@@ -25,6 +25,10 @@ public class LibrarySystem {
         this.menuHandler = new MenuHandler(this);
         this.scanner = new Scanner(System.in);
     }
+
+    public void addBook(String title, String author, int publicationYear, String isbn) {
+        bookManager.addBook(title, author, publicationYear, isbn);
+    }
     public boolean authenticateManager(String username, String password) {
         return MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password);
     }
