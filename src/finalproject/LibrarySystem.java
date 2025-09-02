@@ -31,6 +31,9 @@ public class LibrarySystem {
     public Employee authenticateEmployee(String username, String password) {
         return employeeManager.authenticateEmployee(username, password);
     }
+    public boolean changeEmployeePassword(String username, String newPassword) {
+        return employeeManager.changeEmployeePassword(username, newPassword);
+    }
     public void registerEmployee(String username, String password) {
         employeeManager.registerEmployee(username, password);
     }

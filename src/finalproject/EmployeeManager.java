@@ -41,6 +41,16 @@ public class EmployeeManager {
             System.out.println(employee);
         }
     }
+    public boolean changeEmployeePassword(String username, String newPassword) {
+        for (Employee employee : employees) {
+            if (employee.getUsername().equals(username)) {
+                employee.setPassword(newPassword);
+                FileManager.saveEmployees(employees);
+                return true;
+            }
+        }
+        return false;
+    }
 
     private boolean isUsernameTaken(String username) {
         return employees.stream().anyMatch(e -> e.getUsername().equals(username));
@@ -54,4 +64,3 @@ public class EmployeeManager {
         return new ArrayList<>(employees);
     }
 }
-

@@ -214,19 +214,52 @@ public class MenuHandler {
     private void displayLoggedInEmployeeMenu() {
         while (currentEmployee != null) {
             System.out.println("\n=== Employee Dashboard ===");
-            System.out.println("1. Logout");
+            System.out.println("1. Change Password");
+            System.out.println("2. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 1);
+            int choice = getIntInput(1, 2);
 
             switch (choice) {
                 case 1:
+                    handleChangePassword();
+                    break;
+                case 2:
                     currentEmployee = null;
                     System.out.println("Logged out successfully.");
                     return;
                 default:
                     System.out.println("Invalid option! Please try again.");
             }
+        }
+    }
+    private void handleChangePassword() {
+        System.out.println("\n--- Change Password ---");
+
+        System.out.print("Current Password: ");
+        String currentPassword = scanner.nextLine();
+
+        System.out.print("New Password: ");
+        String newPassword = scanner.nextLine();
+
+        System.out.print("Confirm New Password: ");
+        String newPassword2 = scanner.nextLine();
+
+        if (!currentPassword.equals(currentEmployee.getPassword())) {
+            System.out.println("Current password is incorrect.");
+            return;
+        }
+
+        if (!newPassword.equals(newPassword2)) {
+            System.out.println("New passwords do not match.");
+            return;
+        }
+
+        if (librarySystem.changeEmployeePassword(currentEmployee.getUsername(), newPassword)) {
+            System.out.println("Password changed successfully!");
+            currentEmployee.setPassword(newPassword);
+        } else {
+            System.out.println("Failed to change password.");
         }
     }
 
