@@ -1,7 +1,6 @@
 package finalproject;
 
 import java.time.LocalDate;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,11 +8,14 @@ import java.util.stream.Collectors;
 public class LoanManager {
     private List<Loan> loans;
     private BookManager bookManager;
+    private final IFileManager fileManager;
 
-    public LoanManager(BookManager bookManager) {
-        this.loans = FileManager.loadLoans();
+    public LoanManager(BookManager bookManager, IFileManager fileManager) {
+        this.fileManager = fileManager;
+        this.loans = fileManager.loadLoans();
         this.bookManager = bookManager;
     }
+
     public List<Loan> getPendingLoansForToday() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
@@ -24,6 +26,7 @@ public class LoanManager {
                         loan.getStartDate().equals(yesterday))
                 .collect(Collectors.toList());
     }
+
     public boolean approveLoan(String studentUsername, String bookIsbn) {
         for (Loan loan : loans) {
             if (loan.getStudentUsername().equals(studentUsername) &&
@@ -37,13 +40,14 @@ public class LoanManager {
                     book.setAvailable(false);
                 }
 
-                FileManager.saveLoans(loans);
-                FileManager.saveBooks(bookManager.getAllBooks());
+                fileManager.saveLoans(loans);
+                bookManager.saveBooks();
                 return true;
             }
         }
         return false;
     }
+
     public boolean rejectLoan(String studentUsername, String bookIsbn) {
         for (Loan loan : loans) {
             if (loan.getStudentUsername().equals(studentUsername) &&
@@ -51,15 +55,16 @@ public class LoanManager {
                     loan.getStatus().equals("pending")) {
 
                 loan.setStatus("rejected");
-                FileManager.saveLoans(loans);
+                fileManager.saveLoans(loans);
                 return true;
             }
         }
         return false;
     }
+
     public void addLoan(Loan loan) {
         loans.add(loan);
-        FileManager.saveLoans(loans);
+        fileManager.saveLoans(loans);
     }
 
     public boolean borrowBook(String studentUsername, String bookIsbn, LocalDate startDate, LocalDate endDate) {
@@ -87,8 +92,8 @@ public class LoanManager {
         Loan newLoan = new Loan(studentUsername, bookIsbn, startDate, endDate);
         loans.add(newLoan);
         targetBook.setAvailable(false);
-        FileManager.saveBooks(bookManager.getAllBooks());
-        FileManager.saveLoans(loans);
+        bookManager.saveBooks();
+        fileManager.saveLoans(loans);
 
         System.out.println("Book borrowed successfully from " + startDate + " to " + endDate);
         return true;
@@ -108,6 +113,8 @@ public class LoanManager {
         }
 
         activeLoan.setActive(false);
+        activeLoan.setActualReturnDate(LocalDate.now()); // اضافه کردن تاریخ بازگشت واقعی
+
         List<Book> books = bookManager.getAllBooks();
         Book targetBook = books.stream()
                 .filter(b -> b.getIsbn().equals(bookIsbn))
@@ -116,14 +123,13 @@ public class LoanManager {
 
         if (targetBook != null) {
             targetBook.setAvailable(true);
-            FileManager.saveBooks(books);
+            bookManager.saveBooks();
         }
 
-        FileManager.saveLoans(loans);
+        fileManager.saveLoans(loans);
         System.out.println("Book returned successfully.");
         return true;
     }
-
     public List<Loan> getStudentLoans(String studentUsername) {
         return loans.stream()
                 .filter(loan -> loan.getStudentUsername().equals(studentUsername))
@@ -141,6 +147,24 @@ public class LoanManager {
     }
 
     public void saveLoans() {
-        FileManager.saveLoans(loans);
+        fileManager.saveLoans(loans);
+    } public List<Loan> getStudentLoanHistory(String studentUsername) {
+        return loans.stream()
+                .filter(loan -> loan.getStudentUsername().equals(studentUsername))
+                .collect(Collectors.toList());
+    }
+
+    public StudentLoanStatistics getStudentLoanStatistics(String studentUsername) {
+        List<Loan> studentLoans = getStudentLoanHistory(studentUsername);
+
+        int totalLoans = studentLoans.size();
+        int notReturnedCount = (int) studentLoans.stream()
+                .filter(loan -> loan.isActive() && loan.getStatus().equals("approved"))
+                .count();
+        int lateReturnsCount = (int) studentLoans.stream()
+                .filter(Loan::isReturnedLate)
+                .count();
+
+        return new StudentLoanStatistics(totalLoans, notReturnedCount, lateReturnsCount, studentLoans);
     }
 }

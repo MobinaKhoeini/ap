@@ -5,9 +5,10 @@ import java.util.List;
 
 public class StudentManager {
     private List<Student> students;
+    FileManager fileManager = new FileManager();
 
     public StudentManager() {
-        this.students = FileManager.loadStudents();
+        this.students = fileManager.loadStudents();
     }
 
     public void registerStudent(String name, String studentId, String username, String password) {
@@ -18,7 +19,7 @@ public class StudentManager {
 
         Student newStudent = new Student(name, studentId, username, password);
         students.add(newStudent);
-        FileManager.saveStudents(students);
+        fileManager.saveStudents(students);
         System.out.println("Student registration completed successfully.");
     }
 

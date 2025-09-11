@@ -6,10 +6,13 @@ import java.util.stream.Collectors;
 
 public class BookManager {
     private List<Book> books;
+    private final IFileManager fileManager;
 
-    public BookManager() {
-        this.books = FileManager.loadBooks();
+    public BookManager(IFileManager fileManager) {
+        this.fileManager = fileManager;
+        this.books = fileManager.loadBooks();
     }
+
     public List<Book> searchBooksByTitle(String title) {
         List<Book> results = new ArrayList<>();
         for (Book book : books) {
@@ -19,6 +22,7 @@ public class BookManager {
         }
         return results;
     }
+
     public Book findBookByIsbn(String isbn) {
         for (Book book : books) {
             if (book.getIsbn().equals(isbn)) {
@@ -29,7 +33,7 @@ public class BookManager {
     }
 
     public void saveBooks() {
-        FileManager.saveBooks(books);
+        fileManager.saveBooks(books);
     }
 
     public List<Book> searchBooks(String title, String author, Integer publicationYear) {
@@ -41,6 +45,7 @@ public class BookManager {
                 )
                 .collect(Collectors.toList());
     }
+
     public void addBook(String title, String author, int publicationYear, String isbn) {
         if (isIsbnTaken(isbn)) {
             System.out.println("This ISBN already exists. Please enter another one.");
@@ -49,13 +54,14 @@ public class BookManager {
 
         Book newBook = new Book(title, author, publicationYear, isbn, true);
         books.add(newBook);
-        FileManager.saveBooks(books);
+        fileManager.saveBooks(books);
         System.out.println("Book added successfully!");
     }
 
     private boolean isIsbnTaken(String isbn) {
         return books.stream().anyMatch(b -> b.getIsbn().equals(isbn));
     }
+
     public void displayAvailableBooks() {
         List<Book> availableBooks = books.stream()
                 .filter(Book::isAvailable)
@@ -73,6 +79,6 @@ public class BookManager {
     }
 
     public List<Book> getAllBooks() {
-        return books;
+        return new ArrayList<>(books);
     }
 }

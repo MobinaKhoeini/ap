@@ -1,41 +1,46 @@
 package finalproject;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
-public class FileManager {
-    private static final String STUDENT_FILE = "D:/savingLibrary.txt";
-    private static final String BOOK_FILE = "D:/savingBooks.txt";
-    private static final String LOAN_FILE = "D:/savingloans.txt";
-    private static final String EMPLOYEE_FILE= "D:/savingEmployees.txt";
+public class FileManager implements IFileManager {
+    private String studentFile;
+    private String bookFile;
+    private String loanFile;
+    private String employeeFile;
+    public FileManager() {
+        this.studentFile = "D:/savingLibrary.txt";
+        this.bookFile = "D:/savingBooks.txt";
+        this.loanFile = "D:/savingloans.txt";
+        this.employeeFile = "D:/savingEmployees.txt";
+    }
 
-    public static void saveStudents(List<Student> students) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(STUDENT_FILE))) {
+    @Override
+    public void saveStudents(List<Student> students) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(studentFile))) {
             for (Student student : students) {
-                writer.println(student.getName() + "," +
-                        student.getStudentId() + "," +
-                        student.getUsername() + "," +
-                        student.getPassword());
+                writer.println(student.toFileString());
             }
         } catch (IOException e) {
             System.out.println("Error saving student data: " + e.getMessage());
         }
     }
 
-    public static List<Student> loadStudents() {
-        List<Student> students = new java.util.ArrayList<>();
-        File file = new File(STUDENT_FILE);
+    @Override
+    public List<Student> loadStudents() {
+        List<Student> students = new ArrayList<>();
+        File file = new File(studentFile);
 
         if (!file.exists()) {
             return students;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(STUDENT_FILE))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(studentFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 4) {
-                    Student student = new Student(parts[0], parts[1], parts[2], parts[3]);
+                Student student = Student.fromFileString(line);
+                if (student != null) {
                     students.add(student);
                 }
             }
@@ -46,8 +51,9 @@ public class FileManager {
         return students;
     }
 
-    public static void saveBooks(List<Book> books) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(BOOK_FILE))) {
+    @Override
+    public void saveBooks(List<Book> books) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(bookFile))) {
             for (Book book : books) {
                 writer.println(book.toFileString());
             }
@@ -56,15 +62,17 @@ public class FileManager {
         }
     }
 
-    public static List<Book> loadBooks() {
-        List<Book> books = new java.util.ArrayList<>();
-        File file = new File(BOOK_FILE);
+    @Override
+    public List<Book> loadBooks() {
+        List<Book> books = new ArrayList<>();
+        File file = new File(bookFile);
 
         if (!file.exists()) {
-            System.out.println("no books existing");
+            System.out.println("No books existing");
+            return books;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(BOOK_FILE))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(bookFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 Book book = Book.fromFileString(line);
@@ -79,8 +87,9 @@ public class FileManager {
         return books;
     }
 
-    public static void saveLoans(List<Loan> loans) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(LOAN_FILE))) {
+    @Override
+    public void saveLoans(List<Loan> loans) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(loanFile))) {
             for (Loan loan : loans) {
                 writer.println(loan.toFileString());
             }
@@ -89,15 +98,16 @@ public class FileManager {
         }
     }
 
-    public static List<Loan> loadLoans() {
-        List<Loan> loans = new java.util.ArrayList<>();
-        File file = new File(LOAN_FILE);
+    @Override
+    public List<Loan> loadLoans() {
+        List<Loan> loans = new ArrayList<>();
+        File file = new File(loanFile);
 
         if (!file.exists()) {
             return loans;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(LOAN_FILE))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(loanFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 Loan loan = Loan.fromFileString(line);
@@ -111,8 +121,10 @@ public class FileManager {
 
         return loans;
     }
-    public static void saveEmployees(List<Employee> employees) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(EMPLOYEE_FILE))) {
+
+    @Override
+    public void saveEmployees(List<Employee> employees) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(employeeFile))) {
             for (Employee employee : employees) {
                 writer.println(employee.toFileString());
             }
@@ -120,16 +132,18 @@ public class FileManager {
             System.out.println("Error saving employee data: " + e.getMessage());
         }
     }
-    public static List<Employee> loadEmployees() {
-        List<Employee> employees = new java.util.ArrayList<>();
-        File file = new File(EMPLOYEE_FILE);
+
+    @Override
+    public List<Employee> loadEmployees() {
+        List<Employee> employees = new ArrayList<>();
+        File file = new File(employeeFile);
 
         if (!file.exists()) {
             saveEmployees(employees);
             return employees;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(EMPLOYEE_FILE))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(employeeFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 Employee employee = Employee.fromFileString(line);

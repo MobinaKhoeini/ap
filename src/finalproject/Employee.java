@@ -1,28 +1,12 @@
 package finalproject;
 
-public class Employee {
-    private String username;
-    private String password;
-
+public class Employee extends User {
     public Employee(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        super(username, password);
     }
 
     public String toFileString() {
-        return username + "|" + password;
+        return getUsername() + "|" + getPassword();
     }
 
     public static Employee fromFileString(String fileString) {
@@ -32,10 +16,4 @@ public class Employee {
         }
         return null;
     }
-
-    @Override
-    public String toString() {
-        return "Username: " + username;
-    }
 }
-

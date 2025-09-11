@@ -5,9 +5,11 @@ import java.util.List;
 
 public class EmployeeManager {
     private List<Employee> employees;
+    private final IFileManager fileManager;
 
-    public EmployeeManager() {
-        this.employees = FileManager.loadEmployees();
+    public EmployeeManager(IFileManager fileManager) {
+        this.fileManager = fileManager;
+        this.employees = fileManager.loadEmployees();
     }
 
     public void registerEmployee(String username, String password) {
@@ -18,7 +20,7 @@ public class EmployeeManager {
 
         Employee newEmployee = new Employee(username, password);
         employees.add(newEmployee);
-        FileManager.saveEmployees(employees);
+        fileManager.saveEmployees(employees);
         System.out.println("Employee registration completed successfully.");
     }
 
@@ -41,11 +43,12 @@ public class EmployeeManager {
             System.out.println(employee);
         }
     }
+
     public boolean changeEmployeePassword(String username, String newPassword) {
         for (Employee employee : employees) {
             if (employee.getUsername().equals(username)) {
                 employee.setPassword(newPassword);
-                FileManager.saveEmployees(employees);
+                fileManager.saveEmployees(employees);
                 return true;
             }
         }

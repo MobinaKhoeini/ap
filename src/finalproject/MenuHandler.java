@@ -77,6 +77,7 @@ public class MenuHandler {
             }
         }
     }
+
     private void displayGuestMenu() {
 
         while (true) {
@@ -106,6 +107,7 @@ public class MenuHandler {
             }
         }
     }
+
     private void displayEmployeeAccessMenu() {
         while (true) {
             System.out.println("\n=== Employee Access ===");
@@ -127,6 +129,7 @@ public class MenuHandler {
             }
         }
     }
+
     private void displayManagerMenu() {
         System.out.println("\n=== Manager Access ===");
         System.out.println("1. Login");
@@ -146,6 +149,7 @@ public class MenuHandler {
                 System.out.println("Invalid option! Please try again.");
         }
     }
+
     private void handleManagerLogin() {
         System.out.println("\n--- Manager Login ---");
 
@@ -162,6 +166,7 @@ public class MenuHandler {
             System.out.println("Invalid username or password.");
         }
     }
+
     private void displayLoggedInManagerMenu() {
         System.out.println("\n=== Manager Dashboard ===");
         System.out.println("1. Register New Employee");
@@ -182,6 +187,7 @@ public class MenuHandler {
                 System.out.println("Invalid option! Please try again.");
         }
     }
+
     private void handleEmployeeRegistration() {
         System.out.println("\n--- New Employee Registration ---");
 
@@ -194,6 +200,7 @@ public class MenuHandler {
         librarySystem.registerEmployee(username, password);
         System.out.println("Employee registered successfully!");
     }
+
     private void handleEmployeeLogin() {
         System.out.println("\n--- Employee Login ---");
 
@@ -212,17 +219,19 @@ public class MenuHandler {
             System.out.println("Invalid username or password.");
         }
     }
+
     private void displayLoggedInEmployeeMenu() {
         while (currentEmployee != null) {
             System.out.println("\n=== Employee Dashboard ===");
             System.out.println("1. Add New Book");
             System.out.println("2. Search and Edit Books");
-            System.out.println("3. view Loan Requests");
-            System.out.println("4. Change Password");
-            System.out.println("5. Logout");
+            System.out.println("3. View Loan Requests");
+            System.out.println("4. View Student Loan Report");
+            System.out.println("5. Change Password");
+            System.out.println("6. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 5);
+            int choice = getIntInput(1, 6);
 
             switch (choice) {
                 case 1:
@@ -235,9 +244,12 @@ public class MenuHandler {
                     handleReviewLoanRequests();
                     break;
                 case 4:
-                    handleChangePassword();
+                    ViewStudentLoanReport();
                     break;
                 case 5:
+                    handleChangePassword();
+                    break;
+                case 6:
                     currentEmployee = null;
                     System.out.println("Logged out successfully.");
                     return;
@@ -256,22 +268,30 @@ public class MenuHandler {
             System.out.println("No loan requests for today or yesterday.");
             return;
         }
+    }
 
-        System.out.println("\n Loan Requests:");
-        for (int i = 0; i < pendingLoans.size(); i++) {
-            Loan loan = pendingLoans.get(i);
-            System.out.println((i + 1) + ". " + loan);
+    private void ViewStudentLoanReport() {
+        System.out.println("\n--- Student Loan Report ---");
+
+        System.out.print("Enter student username: ");
+        String studentUsername = scanner.nextLine();
+
+        StudentLoanStatistics statistics = librarySystem.getStudentLoanStatistics(studentUsername);
+        List<Loan> loanHistory = librarySystem.getStudentLoanHistory(studentUsername);
+
+        System.out.println("\n" + statistics.toString());
+
+        System.out.println("\n--- Complete Loan History ---");
+        if (loanHistory.isEmpty()) {
+            System.out.println("No loans recorded for this student.");
+        } else {
+            for (int i = 0; i < loanHistory.size(); i++) {
+                System.out.println((i + 1) + ". " + loanHistory.get(i));
+            }
         }
 
-        System.out.print("Select request number to review (0 to cancel): ");
-        int requestChoice = getIntInput(0, pendingLoans.size());
-
-        if (requestChoice == 0) {
-            return;
-        }
-
-        Loan selectedLoan = pendingLoans.get(requestChoice - 1);
-        reviewLoanRequest(selectedLoan);
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private void reviewLoanRequest(Loan loan) {
