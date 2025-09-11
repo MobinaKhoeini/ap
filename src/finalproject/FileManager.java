@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileManager implements IFileManager {
-    private String studentFile;
-    private String bookFile;
-    private String loanFile;
-    private String employeeFile;
+    private final String studentFile;
+    private final String bookFile;
+    private final String loanFile;
+    private final String employeeFile;
     public FileManager() {
         this.studentFile = "D:/savingLibrary.txt";
         this.bookFile = "D:/savingBooks.txt";
