@@ -1,5 +1,6 @@
 package finalproject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +9,27 @@ public class BookManager {
 
     public BookManager() {
         this.books = FileManager.loadBooks();
+    }
+    public List<Book> searchBooksByTitle(String title) {
+        List<Book> results = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getTitle().toLowerCase().contains(title.toLowerCase())) {
+                results.add(book);
+            }
+        }
+        return results;
+    }
+    public Book findBookByIsbn(String isbn) {
+        for (Book book : books) {
+            if (book.getIsbn().equals(isbn)) {
+                return book;
+            }
+        }
+        return null;
+    }
+
+    public void saveBooks() {
+        FileManager.saveBooks(books);
     }
 
     public List<Book> searchBooks(String title, String author, Integer publicationYear) {

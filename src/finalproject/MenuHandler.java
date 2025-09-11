@@ -1,5 +1,6 @@
 package finalproject;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class MenuHandler {
@@ -215,20 +216,28 @@ public class MenuHandler {
         while (currentEmployee != null) {
             System.out.println("\n=== Employee Dashboard ===");
             System.out.println("1. Add New Book");
-            System.out.println("2. Change Password");
-            System.out.println("3. Logout");
+            System.out.println("2. Search and Edit Books");
+            System.out.println("3. view Loan Requests");
+            System.out.println("4. Change Password");
+            System.out.println("5. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 3);
+            int choice = getIntInput(1, 5);
 
             switch (choice) {
                 case 1:
                     handleAddNewBook();
                     break;
                 case 2:
-                    handleChangePassword();
+                    handleSearchAndEditBooks();
                     break;
                 case 3:
+                    handleReviewLoanRequests();
+                    break;
+                case 4:
+                    handleChangePassword();
+                    break;
+                case 5:
                     currentEmployee = null;
                     System.out.println("Logged out successfully.");
                     return;
@@ -236,6 +245,130 @@ public class MenuHandler {
                     System.out.println("Invalid option! Please try again.");
             }
         }
+    }
+
+    private void handleReviewLoanRequests() {
+        System.out.println("\n--- view Loan Requests ---");
+
+        List<Loan> pendingLoans = librarySystem.getPendingLoansForReview();
+
+        if (pendingLoans.isEmpty()) {
+            System.out.println("No loan requests for today or yesterday.");
+            return;
+        }
+
+        System.out.println("\n Loan Requests:");
+        for (int i = 0; i < pendingLoans.size(); i++) {
+            Loan loan = pendingLoans.get(i);
+            System.out.println((i + 1) + ". " + loan);
+        }
+
+        System.out.print("Select request number to review (0 to cancel): ");
+        int requestChoice = getIntInput(0, pendingLoans.size());
+
+        if (requestChoice == 0) {
+            return;
+        }
+
+        Loan selectedLoan = pendingLoans.get(requestChoice - 1);
+        reviewLoanRequest(selectedLoan);
+    }
+
+    private void reviewLoanRequest(Loan loan) {
+        System.out.println("\n--- Review Loan Request ---");
+        System.out.println("Request Details: " + loan);
+
+        System.out.println("\n1. Approve Request");
+        System.out.println("2. Reject Request");
+        System.out.println("3. Cancel");
+        System.out.print("Please enter your choice: ");
+
+        int choice = getIntInput(1, 3);
+
+        switch (choice) {
+            case 1:
+                if (librarySystem.approveLoanRequest(loan.getStudentUsername(), loan.getBookIsbn())) {
+                    System.out.println("Loan request approved successfully!");
+                    System.out.println("Student can now borrow the book from the library.");
+                } else {
+                    System.out.println("Failed to approve loan request.");
+                }
+                break;
+            case 2:
+                if (librarySystem.rejectLoanRequest(loan.getStudentUsername(), loan.getBookIsbn())) {
+                    System.out.println("Loan request rejected.");
+                } else {
+                    System.out.println("Failed to reject loan request.");
+                }
+                break;
+            case 3:
+                System.out.println("Review is not completed.");
+                break;
+        }
+    }
+    private void handleSearchAndEditBooks() {
+        System.out.println("\n--- Search and Edit Books ---");
+
+        System.out.print("Enter book title to search: ");
+        String searchTitle = scanner.nextLine();
+
+        List<Book> foundBooks = librarySystem.searchBooksByTitle(searchTitle);
+
+        if (foundBooks.isEmpty()) {
+            System.out.println("No books found with title: " + searchTitle);
+            return;
+        }
+
+
+        System.out.println("\nFound Books:");
+        for (int i = 0; i < foundBooks.size(); i++) {
+            System.out.println((i + 1) + ". " + foundBooks.get(i));
+        }
+
+        System.out.print("enter book number / enter 0 to return: ");
+        int bookChoice = getIntInput(0, foundBooks.size());
+
+        if (bookChoice == 0) {
+            return;
+        }
+
+        Book selectedBook = foundBooks.get(bookChoice - 1);
+        editBookDetails(selectedBook);
+    }
+    private void editBookDetails(Book book) {
+        System.out.println("\n--- Edit Book ---");
+        System.out.println("Current information: " + book);
+
+        System.out.print("New title (press Enter to keep unchanged): ");
+        String newTitle = scanner.nextLine();
+        if (!newTitle.isEmpty()) {
+            book.setTitle(newTitle);
+        }
+
+        System.out.print("New author (press Enter to keep unchanged): ");
+        String newAuthor = scanner.nextLine();
+        if (!newAuthor.isEmpty()) {
+            book.setAuthor(newAuthor);
+        }
+
+        System.out.print("New publication year (press Enter to keep unchanged): ");
+        String yearInput = scanner.nextLine();
+        if (!yearInput.isEmpty()) {
+            try {
+                int newYear = Integer.parseInt(yearInput);
+                book.setPublicationYear(newYear);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid year format. Year not changed.");
+            }
+        }
+        System.out.print("Change availability? (y/n): ");
+        String change = scanner.nextLine();
+        if (change.equalsIgnoreCase("y")) {
+            book.setAvailable(!book.isAvailable());
+        }
+
+        librarySystem.saveBooks();
+        System.out.println("Book updated successfully!");
     }
     private void handleAddNewBook() {
         System.out.println("\n--- Add New Book ---");
@@ -253,7 +386,6 @@ public class MenuHandler {
         String isbn = scanner.nextLine();
 
         librarySystem.addBook(title, author, year, isbn);
-
     }
     private void handleChangePassword() {
         System.out.println("\n--- Change Password ---");

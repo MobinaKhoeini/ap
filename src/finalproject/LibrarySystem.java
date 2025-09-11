@@ -29,6 +29,13 @@ public class LibrarySystem {
     public void addBook(String title, String author, int publicationYear, String isbn) {
         bookManager.addBook(title, author, publicationYear, isbn);
     }
+    public List<Book> searchBooksByTitle(String title) {
+        return bookManager.searchBooksByTitle(title);
+    }
+
+    public void saveBooks() {
+        bookManager.saveBooks();
+    }
     public boolean authenticateManager(String username, String password) {
         return MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password);
     }
@@ -40,6 +47,17 @@ public class LibrarySystem {
     }
     public void registerEmployee(String username, String password) {
         employeeManager.registerEmployee(username, password);
+    }
+    public List<Loan> getPendingLoansForReview() {
+        return loanManager.getPendingLoansForToday();
+    }
+
+    public boolean approveLoanRequest(String studentUsername, String bookIsbn) {
+        return loanManager.approveLoan(studentUsername, bookIsbn);
+    }
+
+    public boolean rejectLoanRequest(String studentUsername, String bookIsbn) {
+        return loanManager.rejectLoan(studentUsername, bookIsbn);
     }
 
     public int getStudentCount() {
@@ -93,14 +111,16 @@ public class LibrarySystem {
                 System.out.println("End date cannot be before start date.");
                 return;
             }
+            Loan newLoan = new Loan(student.getUsername(), isbn, startDate, endDate);
+            loanManager.addLoan(newLoan);
 
-            loanManager.borrowBook(student.getUsername(), isbn, startDate, endDate);
+            System.out.println("Loan request submitted. Please wait for employee approval.");
+            System.out.println("After approval, you can borrow the book from the library.");
 
         } catch (Exception e) {
             System.out.println("Invalid date format. Please use YYYY-MM-DD.");
         }
     }
-
     public void returnBook(Student student) {
         System.out.println("\n--- Return Book ---");
 

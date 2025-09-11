@@ -1,6 +1,7 @@
 package finalproject;
 
 import java.time.LocalDate;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +13,53 @@ public class LoanManager {
     public LoanManager(BookManager bookManager) {
         this.loans = FileManager.loadLoans();
         this.bookManager = bookManager;
+    }
+    public List<Loan> getPendingLoansForToday() {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+
+        return loans.stream()
+                .filter(loan -> loan.getStatus().equals("pending"))
+                .filter(loan -> loan.getStartDate().equals(today) ||
+                        loan.getStartDate().equals(yesterday))
+                .collect(Collectors.toList());
+    }
+    public boolean approveLoan(String studentUsername, String bookIsbn) {
+        for (Loan loan : loans) {
+            if (loan.getStudentUsername().equals(studentUsername) &&
+                    loan.getBookIsbn().equals(bookIsbn) &&
+                    loan.getStatus().equals("pending")) {
+
+                loan.setStatus("approved");
+                loan.setActive(true);
+                Book book = bookManager.findBookByIsbn(bookIsbn);
+                if (book != null) {
+                    book.setAvailable(false);
+                }
+
+                FileManager.saveLoans(loans);
+                FileManager.saveBooks(bookManager.getAllBooks());
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean rejectLoan(String studentUsername, String bookIsbn) {
+        for (Loan loan : loans) {
+            if (loan.getStudentUsername().equals(studentUsername) &&
+                    loan.getBookIsbn().equals(bookIsbn) &&
+                    loan.getStatus().equals("pending")) {
+
+                loan.setStatus("rejected");
+                FileManager.saveLoans(loans);
+                return true;
+            }
+        }
+        return false;
+    }
+    public void addLoan(Loan loan) {
+        loans.add(loan);
+        FileManager.saveLoans(loans);
     }
 
     public boolean borrowBook(String studentUsername, String bookIsbn, LocalDate startDate, LocalDate endDate) {
