@@ -154,7 +154,7 @@ public class MenuHandler {
     private void handleManagerLogin() {
         System.out.println("\n--- Manager Login ---");
 
-        System.out.print("Username: (admin) ");
+        System.out.print("Username: put the word in the parentheses (admin) ");
         String username = scanner.nextLine();
 
         System.out.print("Password: (123) ");
@@ -172,10 +172,12 @@ public class MenuHandler {
         System.out.println("\n=== Manager Dashboard ===");
         System.out.println("1. Register New Employee");
         System.out.println("2. View Employee Performance");
-        System.out.println("3. Logout");
+        System.out.println("3. View Loan Statistics");
+        System.out.println("4. View Detailed Loan Report");
+        System.out.println("5. Logout");
         System.out.print("Please enter your choice: ");
 
-        int choice = getIntInput(1, 3);
+        int choice = getIntInput(1, 5);
 
         switch (choice) {
             case 1:
@@ -185,6 +187,12 @@ public class MenuHandler {
                 librarySystem.displayEmployeePerformance();
                 break;
             case 3:
+                handleViewLoanStatistics();
+                break;
+            case 4:
+                librarySystem.displayDetailedLoanReport();
+                break;
+            case 5:
                 isManagerLoggedIn = false;
                 System.out.println("Logged out successfully.");
                 return;
@@ -205,7 +213,14 @@ public class MenuHandler {
         librarySystem.registerEmployee(username, password);
         System.out.println("Employee registered successfully!");
     }
+    private void handleViewLoanStatistics() {
+        System.out.println("\n=== Loan Statistics ===");
+        LoanStatistics stats = librarySystem.getLoanStatistics();
+        System.out.println(stats.toString());
 
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
     private void handleEmployeeLogin() {
         System.out.println("\n--- Employee Login ---");
 

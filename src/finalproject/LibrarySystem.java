@@ -72,6 +72,42 @@ public class LibrarySystem {
     public Student getStudentByUsername(String username) {
         return studentManager.getStudentByUsername(username);
     }
+    public LoanStatistics getLoanStatistics() {
+        return loanManager.getLoanStatistics();
+    }
+
+    public List<Loan> getAllLoans() {
+        return loanManager.getAllLoans();
+    }
+
+    public void displayDetailedLoanReport() {
+        LoanStatistics stats = getLoanStatistics();
+        List<Loan> allLoans = getAllLoans();
+
+        System.out.println("\n=== Detailed Loan Statistics Report ===");
+        System.out.println(stats.toString());
+
+        System.out.println("\n--- Loan Status Breakdown ---");
+        long pendingCount = allLoans.stream().filter(loan -> "pending".equals(loan.getStatus())).count();
+        long approvedCount = allLoans.stream().filter(loan -> "approved".equals(loan.getStatus())).count();
+        long rejectedCount = allLoans.stream().filter(loan -> "rejected".equals(loan.getStatus())).count();
+
+        System.out.println("Pending Loans: " + pendingCount);
+        System.out.println("Approved Loans: " + approvedCount);
+        System.out.println("Rejected Loans: " + rejectedCount);
+
+        System.out.println("\n--- Current Active Loans ---");
+        long activeLoans = allLoans.stream().filter(loan -> loan.isActive()).count();
+        System.out.println("Currently Active Loans: " + activeLoans);
+
+        System.out.println("\n--- Overdue Loans ---");
+        long overdueLoans = allLoans.stream()
+                .filter(loan -> loan.isActive() && loan.isPickedUp() && !loan.isReturned())
+                .filter(loan -> LocalDate.now().isAfter(loan.getEndDate()))
+                .count();
+        System.out.println("Overdue Loans: " + overdueLoans);
+    }
+
     public List<Loan> getAllPendingLoans() {
         return loanManager.getAllPendingLoans();
     }

@@ -1,6 +1,7 @@
 package finalproject;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +59,29 @@ public class LoanManager {
         }
         return false;
     }
+    public LoanStatistics getLoanStatistics() {
+        int totalLoanRequests = loans.size();
 
+        int totalLoansApproved = (int) loans.stream()
+                .filter(loan -> "approved".equals(loan.getStatus()))
+                .count();
+
+        int totalLoansCompleted = (int) loans.stream()
+                .filter(loan -> loan.isReturned())
+                .count();
+
+        double averageLoanDuration = loans.stream()
+                .filter(loan -> loan.isPickedUp() && loan.isReturned())
+                .mapToLong(loan -> ChronoUnit.DAYS.between(
+                        loan.getActualPickupDate(),
+                        loan.getActualReturnDate()
+                ))
+                .average()
+                .orElse(0.0);
+
+        return new LoanStatistics(totalLoanRequests, totalLoansApproved,
+                totalLoansCompleted, averageLoanDuration);
+    }
 
     public boolean rejectLoan(String studentUsername, String bookIsbn) {
         for (Loan loan : loans) {
