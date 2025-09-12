@@ -171,16 +171,20 @@ public class MenuHandler {
     private void displayLoggedInManagerMenu() {
         System.out.println("\n=== Manager Dashboard ===");
         System.out.println("1. Register New Employee");
-        System.out.println("2. Logout");
+        System.out.println("2. View Employee Performance");
+        System.out.println("3. Logout");
         System.out.print("Please enter your choice: ");
 
-        int choice = getIntInput(1, 2);
+        int choice = getIntInput(1, 3);
 
         switch (choice) {
             case 1:
                 handleEmployeeRegistration();
                 break;
             case 2:
+                librarySystem.displayEmployeePerformance();
+                break;
+            case 3:
                 isManagerLoggedIn = false;
                 System.out.println("Logged out successfully.");
                 return;
@@ -270,7 +274,6 @@ public class MenuHandler {
     private void handleReviewLoanRequests() {
         System.out.println("\n--- Review Loan Requests ---");
 
-        // از متد جدید استفاده می‌کنیم که همه درخواست‌های pending رو می‌گیره
         List<Loan> pendingLoans = librarySystem.getAllPendingLoans();
 
         if (pendingLoans.isEmpty()) {
@@ -310,6 +313,9 @@ public class MenuHandler {
             case 1:
                 if (librarySystem.approveLoanRequest(loan.getStudentUsername(), loan.getBookIsbn())) {
                     System.out.println("Loan request approved successfully!");
+                    if (currentEmployee != null) {
+                        librarySystem.incrementEmployeeBooksLoaned(currentEmployee.getUsername());
+                    }
                 } else {
                     System.out.println("Failed to approve loan request.");
                 }
@@ -366,6 +372,9 @@ public class MenuHandler {
         if (confirmation.equalsIgnoreCase("y")) {
             if (librarySystem.recordBookPickup(selectedLoan.getStudentUsername(), selectedLoan.getBookIsbn())) {
                 System.out.println("Book pickup recorded successfully!");
+                if (currentEmployee != null) {
+                    librarySystem.incrementEmployeeBooksReturned(currentEmployee.getUsername());
+                }
             } else {
                 System.out.println("Failed to record book pickup.");
             }
@@ -524,6 +533,10 @@ public class MenuHandler {
         String isbn = scanner.nextLine();
 
         librarySystem.addBook(title, author, year, isbn);
+
+        if (currentEmployee != null) {
+            librarySystem.incrementEmployeeBooksAdded(currentEmployee.getUsername());
+        }
     }
     private void handleChangePassword() {
         System.out.println("\n--- Change Password ---");

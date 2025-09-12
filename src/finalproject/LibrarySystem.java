@@ -95,7 +95,13 @@ public class LibrarySystem {
     public List<Loan> getPendingLoansForReview() {
         return loanManager.getPendingLoansForToday();
     }
+    public void incrementEmployeeBooksAdded(String username) {
+        employeeManager.incrementEmployeeBooksAdded(username);
+    }
 
+    public void incrementEmployeeBooksLoaned(String username) {
+        employeeManager.incrementEmployeeBooksLoaned(username);
+    }
 
     public boolean approveLoanRequest(String studentUsername, String bookIsbn) {
         return loanManager.approveLoan(studentUsername, bookIsbn);
@@ -119,6 +125,13 @@ public class LibrarySystem {
 
     public int getTotalLoansCount() {
         return loanManager.getAllLoans().size();
+    }
+    public void incrementEmployeeBooksReturned(String username) {
+        employeeManager.incrementEmployeeBooksReturned(username);
+    }
+
+    public void displayEmployeePerformance() {
+        employeeManager.displayEmployeePerformance();
     }
 
     public int getActiveLoansCount() {

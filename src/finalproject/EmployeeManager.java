@@ -23,6 +23,49 @@ public class EmployeeManager {
         fileManager.saveEmployees(employees);
         System.out.println("Employee registration completed successfully.");
     }
+    public Employee getEmployeeByUsername(String username) {
+        return employees.stream()
+                .filter(e -> e.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void incrementEmployeeBooksAdded(String username) {
+        Employee employee = getEmployeeByUsername(username);
+        if (employee != null) {
+            employee.incrementBooksAdded();
+            fileManager.saveEmployees(employees);
+        }
+    }
+
+    public void incrementEmployeeBooksLoaned(String username) {
+        Employee employee = getEmployeeByUsername(username);
+        if (employee != null) {
+            employee.incrementBooksLoaned();
+            fileManager.saveEmployees(employees);
+        }
+    }
+
+    public void incrementEmployeeBooksReturned(String username) {
+        Employee employee = getEmployeeByUsername(username);
+        if (employee != null) {
+            employee.incrementBooksReturned();
+            fileManager.saveEmployees(employees);
+        }
+    }
+
+    public void displayEmployeePerformance() {
+        System.out.println("\n--- Employee Performance Report ---");
+
+        if (employees.isEmpty()) {
+            System.out.println("No employees have been registered yet.");
+            return;
+        }
+
+        for (Employee employee : employees) {
+            System.out.println(employee);
+        }
+    }
 
     public Employee authenticateEmployee(String username, String password) {
         return employees.stream()
