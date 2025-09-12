@@ -227,11 +227,12 @@ public class MenuHandler {
             System.out.println("2. Search and Edit Books");
             System.out.println("3. View Loan Requests");
             System.out.println("4. View Student Loan Report");
-            System.out.println("5. Change Password");
-            System.out.println("6. Logout");
+            System.out.println("5. Manage Student Status");
+            System.out.println("6. Change Password");
+            System.out.println("7. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 6);
+            int choice = getIntInput(1, 7);
 
             switch (choice) {
                 case 1:
@@ -247,9 +248,12 @@ public class MenuHandler {
                     ViewStudentLoanReport();
                     break;
                 case 5:
-                    handleChangePassword();
+                    ManageStudentStatus();
                     break;
                 case 6:
+                    handleChangePassword();
+                    break;
+                case 7:
                     currentEmployee = null;
                     System.out.println("Logged out successfully.");
                     return;
@@ -323,6 +327,52 @@ public class MenuHandler {
                 break;
             case 3:
                 System.out.println("Review is not completed.");
+                break;
+        }
+    }
+    private void ManageStudentStatus() {
+        System.out.println("\n--- Manage Student Status ---");
+
+        librarySystem.displayStudentsWithStatus();
+
+        System.out.print("\nEnter student username to manage (or 'cancel' to return): ");
+        String username = scanner.nextLine();
+
+        if (username.equalsIgnoreCase("cancel")) {
+            return;
+        }
+
+        Student student = librarySystem.getStudentByUsername(username);
+        if (student == null) {
+            System.out.println("Student not found.");
+            return;
+        }
+
+        System.out.println("Current status: " + (student.isActive() ? "Active" : "Inactive"));
+        System.out.println("1. Activate Student");
+        System.out.println("2. Deactivate Student");
+        System.out.println("3. Cancel");
+        System.out.print("Choose an option: ");
+
+        int option = getIntInput(1, 3);
+
+        switch (option) {
+            case 1:
+                if (librarySystem.setStudentStatus(username, true)) {
+                    System.out.println("Student activated successfully.");
+                } else {
+                    System.out.println("Failed to activate student.");
+                }
+                break;
+            case 2:
+                if (librarySystem.setStudentStatus(username, false)) {
+                    System.out.println("Student deactivated successfully.");
+                } else {
+                    System.out.println("Failed to deactivate student.");
+                }
+                break;
+            case 3:
+                System.out.println("Operation cancelled.");
                 break;
         }
     }

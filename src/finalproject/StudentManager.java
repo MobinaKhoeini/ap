@@ -5,9 +5,13 @@ import java.util.List;
 
 public class StudentManager {
     private List<Student> students;
-    FileManager fileManager = new FileManager();
+    private final IFileManager fileManager;
 
-    public StudentManager() {
+    public StudentManager(IFileManager fileManager) {
+        if (fileManager == null) {
+            throw new IllegalArgumentException("FileManager cannot be null");
+        }
+        this.fileManager = fileManager;
         this.students = fileManager.loadStudents();
     }
 
@@ -42,8 +46,33 @@ public class StudentManager {
             System.out.println(student);
         }
     }
+    public Student getStudentByUsername(String username) {
+        return students.stream()
+                .filter(s -> s.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+    }
+    public boolean setStudentStatus(String username, boolean isActive) {
+        Student student = getStudentByUsername(username);
+        if (student != null) {
+            student.setActive(isActive);
+            fileManager.saveStudents(students);
+            return true;
+        }
+        return false;
+    }
+    public void displayStudentsWithStatus() {
+        System.out.println("\n--- List of Registered Students ---");
 
+        if (students.isEmpty()) {
+            System.out.println("No students have registered yet.");
+            return;
+        }
 
+        for (Student student : students) {
+            System.out.println(student);
+        }
+    }
     private boolean isUsernameTaken(String username) {
         return students.stream().anyMatch(s -> s.getUsername().equals(username));
     }

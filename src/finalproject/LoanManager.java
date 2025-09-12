@@ -9,11 +9,13 @@ public class LoanManager {
     private List<Loan> loans;
     private BookManager bookManager;
     private final IFileManager fileManager;
+    private final StudentManager studentManager;
 
-    public LoanManager(BookManager bookManager, IFileManager fileManager) {
+    public LoanManager(BookManager bookManager, IFileManager fileManager, StudentManager studentManager) {
         this.fileManager = fileManager;
         this.loans = fileManager.loadLoans();
         this.bookManager = bookManager;
+        this.studentManager = studentManager;
     }
 
     public List<Loan> getPendingLoansForToday() {
@@ -63,11 +65,23 @@ public class LoanManager {
     }
 
     public void addLoan(Loan loan) {
+        Student student = studentManager.getStudentByUsername(loan.getStudentUsername());
+        if (student != null && !student.isActive()) {
+            System.out.println("Cannot create loan: Student is inactive.");
+            return;
+        }
+
         loans.add(loan);
         fileManager.saveLoans(loans);
     }
 
     public boolean borrowBook(String studentUsername, String bookIsbn, LocalDate startDate, LocalDate endDate) {
+        Student student = studentManager.getStudentByUsername(studentUsername);
+        if (student != null && !student.isActive()) {
+            System.out.println("Cannot borrow book: Student is inactive.");
+            return false;
+        }
+
         List<Book> books = bookManager.getAllBooks();
         Book targetBook = books.stream()
                 .filter(b -> b.getIsbn().equals(bookIsbn) && b.isAvailable())
@@ -99,6 +113,7 @@ public class LoanManager {
         return true;
     }
 
+
     public boolean returnBook(String studentUsername, String bookIsbn) {
         Loan activeLoan = loans.stream()
                 .filter(loan -> loan.getStudentUsername().equals(studentUsername) &&
@@ -113,7 +128,7 @@ public class LoanManager {
         }
 
         activeLoan.setActive(false);
-        activeLoan.setActualReturnDate(LocalDate.now()); // اضافه کردن تاریخ بازگشت واقعی
+        activeLoan.setActualReturnDate(LocalDate.now());
 
         List<Book> books = bookManager.getAllBooks();
         Book targetBook = books.stream()

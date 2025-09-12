@@ -12,17 +12,17 @@ public class LibrarySystem {
     private EmployeeManager employeeManager;
     private MenuHandler menuHandler;
     private Scanner scanner;
-    private final IFileManager fileManager;
+    private IFileManager fileManager;
 
     private static final int UNIVERSITY_STUDENT_COUNT = 5000;
     private static final String MANAGER_USERNAME = "admin";
     private static final String MANAGER_PASSWORD = "123";
 
     public LibrarySystem() {
-        this.fileManager = new FileManager();
-        this.studentManager = new StudentManager();
+        fileManager = new FileManager();
+        this.studentManager = new StudentManager(fileManager);
         this.bookManager = new BookManager(fileManager);
-        this.loanManager = new LoanManager(bookManager, fileManager);
+        this.loanManager = new LoanManager(bookManager, fileManager, studentManager);
         this.employeeManager = new EmployeeManager(fileManager);
         this.menuHandler = new MenuHandler(this);
         this.scanner = new Scanner(System.in);
@@ -50,6 +50,17 @@ public class LibrarySystem {
 
     public boolean authenticateManager(String username, String password) {
         return MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password);
+    }
+    public boolean setStudentStatus(String username, boolean isActive) {
+        return studentManager.setStudentStatus(username, isActive);
+    }
+
+    public Student getStudentByUsername(String username) {
+        return studentManager.getStudentByUsername(username);
+    }
+
+    public void displayStudentsWithStatus() {
+        studentManager.displayStudentsWithStatus();
     }
 
     public Employee authenticateEmployee(String username, String password) {
