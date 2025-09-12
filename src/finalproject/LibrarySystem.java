@@ -32,6 +32,17 @@ public class LibrarySystem {
     public void addBook(String title, String author, int publicationYear, String isbn) {
         bookManager.addBook(title, author, publicationYear, isbn);
     }
+    public List<Loan> getApprovedButNotPickedUpLoans() {
+        return loanManager.getApprovedButNotPickedUpLoans();
+    }
+
+    public boolean recordBookPickup(String studentUsername, String bookIsbn) {
+        return loanManager.recordBookPickup(studentUsername, bookIsbn);
+    }
+
+    public List<Loan> getActiveLoansToReturn() {
+        return loanManager.getActiveLoansToReturn();
+    }
 
     public List<Book> searchBooksByTitle(String title) {
         return bookManager.searchBooksByTitle(title);
@@ -47,6 +58,9 @@ public class LibrarySystem {
     public void saveBooks() {
         bookManager.saveBooks();
     }
+    public List<Loan> getApprovedLoans() {
+        return loanManager.getApprovedLoans();
+    }
 
     public boolean authenticateManager(String username, String password) {
         return MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password);
@@ -57,6 +71,9 @@ public class LibrarySystem {
 
     public Student getStudentByUsername(String username) {
         return studentManager.getStudentByUsername(username);
+    }
+    public List<Loan> getAllPendingLoans() {
+        return loanManager.getAllPendingLoans();
     }
 
     public void displayStudentsWithStatus() {
@@ -78,6 +95,7 @@ public class LibrarySystem {
     public List<Loan> getPendingLoansForReview() {
         return loanManager.getPendingLoansForToday();
     }
+
 
     public boolean approveLoanRequest(String studentUsername, String bookIsbn) {
         return loanManager.approveLoan(studentUsername, bookIsbn);

@@ -10,6 +10,7 @@ public class Loan {
     private LocalDate endDate;
     private boolean isActive;
     private String status;
+    private LocalDate actualPickupDate;
     private LocalDate actualReturnDate;
 
     public Loan(String studentUsername, String bookIsbn, LocalDate startDate, LocalDate endDate) {
@@ -19,6 +20,7 @@ public class Loan {
         this.endDate = endDate;
         this.isActive = false;
         this.status = "pending";
+        this.actualPickupDate = null;
         this.actualReturnDate = null;
     }
 
@@ -69,17 +71,34 @@ public class Loan {
         return actualReturnDate.isAfter(endDate);
     }
 
+    public LocalDate getActualPickupDate() {
+        return actualPickupDate;
+    }
+
+    public void setActualPickupDate(LocalDate actualPickupDate) {
+        this.actualPickupDate = actualPickupDate;
+    }
+
+    public boolean isPickedUp() {
+        return actualPickupDate != null;
+    }
+
+    public boolean isReturned() {
+        return actualReturnDate != null;
+    }
+
     public String toFileString() {
         return studentUsername + "|" + bookIsbn + "|" +
                 startDate.format(DateTimeFormatter.ISO_DATE) + "|" +
                 endDate.format(DateTimeFormatter.ISO_DATE) + "|" +
                 isActive + "|" + status + "|" +
+                (actualPickupDate != null ? actualPickupDate.format(DateTimeFormatter.ISO_DATE) : "null") + "|" +
                 (actualReturnDate != null ? actualReturnDate.format(DateTimeFormatter.ISO_DATE) : "null");
     }
 
     public static Loan fromFileString(String fileString) {
         String[] parts = fileString.split("\\|");
-        if (parts.length == 7) {
+        if (parts.length == 8) {
             LocalDate startDate = LocalDate.parse(parts[2], DateTimeFormatter.ISO_DATE);
             LocalDate endDate = LocalDate.parse(parts[3], DateTimeFormatter.ISO_DATE);
             Loan loan = new Loan(parts[0], parts[1], startDate, endDate);
@@ -87,7 +106,11 @@ public class Loan {
             loan.setStatus(parts[5]);
 
             if (!"null".equals(parts[6])) {
-                loan.setActualReturnDate(LocalDate.parse(parts[6], DateTimeFormatter.ISO_DATE));
+                loan.setActualPickupDate(LocalDate.parse(parts[6], DateTimeFormatter.ISO_DATE));
+            }
+
+            if (!"null".equals(parts[7])) {
+                loan.setActualReturnDate(LocalDate.parse(parts[7], DateTimeFormatter.ISO_DATE));
             }
 
             return loan;
@@ -101,16 +124,12 @@ public class Loan {
                 " | Book ISBN: " + bookIsbn +
                 " | Start: " + startDate +
                 " | End: " + endDate +
-                " | Returned: " + (actualReturnDate != null ? actualReturnDate : "Not returned") +
+                " | Pickup: " + (actualPickupDate != null ? actualPickupDate : "Not picked up") +
+                " | Return: " + (actualReturnDate != null ? actualReturnDate : "Not returned") +
                 " | Status: " + status +
-                " | Active: " + (isActive ? "Yes" : "No") +
-                " | Late: " + (isReturnedLate() ? "Yes" : "No");
+                " | Active: " + (isActive ? "Yes" : "No");
     }
 
-    public boolean isStartDateTodayOrYesterday() {
-        LocalDate today = LocalDate.now();
-        LocalDate yesterday = today.minusDays(1);
-        return startDate.equals(today) || startDate.equals(yesterday);
-    }
 }
+
 

@@ -88,7 +88,7 @@ public class MenuHandler {
             System.out.println("4. Back to Main Menu");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 3);
+            int choice = getIntInput(1, 4);
 
             switch (choice) {
                 case 1:
@@ -96,6 +96,7 @@ public class MenuHandler {
                     break;
                 case 2:
                     guestBookSearch();
+                    break;
                 case 3:
                     displayLibraryStatistics();
                     break;
@@ -226,13 +227,14 @@ public class MenuHandler {
             System.out.println("1. Add New Book");
             System.out.println("2. Search and Edit Books");
             System.out.println("3. View Loan Requests");
-            System.out.println("4. View Student Loan Report");
-            System.out.println("5. Manage Student Status");
-            System.out.println("6. Change Password");
-            System.out.println("7. Logout");
+            System.out.println("4. Book Pickup");
+            System.out.println("5. View Student Loan Report");
+            System.out.println("6. Manage Student Status");
+            System.out.println("7. Change Password");
+            System.out.println("8. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 7);
+            int choice = getIntInput(1, 8);
 
             switch (choice) {
                 case 1:
@@ -245,15 +247,18 @@ public class MenuHandler {
                     handleReviewLoanRequests();
                     break;
                 case 4:
-                    ViewStudentLoanReport();
+                    handleRecordBookPickup();
                     break;
                 case 5:
-                    ManageStudentStatus();
+                    ViewStudentLoanReport();
                     break;
                 case 6:
-                    handleChangePassword();
+                    ManageStudentStatus();
                     break;
                 case 7:
+                    handleChangePassword();
+                    break;
+                case 8:
                     currentEmployee = null;
                     System.out.println("Logged out successfully.");
                     return;
@@ -262,15 +267,110 @@ public class MenuHandler {
             }
         }
     }
-
     private void handleReviewLoanRequests() {
-        System.out.println("\n--- view Loan Requests ---");
+        System.out.println("\n--- Review Loan Requests ---");
 
-        List<Loan> pendingLoans = librarySystem.getPendingLoansForReview();
+        // از متد جدید استفاده می‌کنیم که همه درخواست‌های pending رو می‌گیره
+        List<Loan> pendingLoans = librarySystem.getAllPendingLoans();
 
         if (pendingLoans.isEmpty()) {
-            System.out.println("No loan requests for today or yesterday.");
+            System.out.println("No pending loan requests.");
             return;
+        }
+
+        System.out.println("\nPending Loan Requests:");
+        for (int i = 0; i < pendingLoans.size(); i++) {
+            Loan loan = pendingLoans.get(i);
+            System.out.println((i + 1) + ". " + loan);
+        }
+
+        System.out.print("Select request number to review (0 to cancel): ");
+        int requestChoice = getIntInput(0, pendingLoans.size());
+
+        if (requestChoice == 0) {
+            return;
+        }
+
+        Loan selectedLoan = pendingLoans.get(requestChoice - 1);
+        reviewLoanRequest(selectedLoan);
+    }
+
+    private void reviewLoanRequest(Loan loan) {
+        System.out.println("\n--- Review Loan Request ---");
+        System.out.println("Request Details: " + loan);
+
+        System.out.println("\n1. Approve Request");
+        System.out.println("2. Reject Request");
+        System.out.println("3. Cancel");
+        System.out.print("Please enter your choice: ");
+
+        int choice = getIntInput(1, 3);
+
+        switch (choice) {
+            case 1:
+                if (librarySystem.approveLoanRequest(loan.getStudentUsername(), loan.getBookIsbn())) {
+                    System.out.println("Loan request approved successfully!");
+                } else {
+                    System.out.println("Failed to approve loan request.");
+                }
+                break;
+            case 2:
+                if (librarySystem.rejectLoanRequest(loan.getStudentUsername(), loan.getBookIsbn())) {
+                    System.out.println("Loan request rejected.");
+                } else {
+                    System.out.println("Failed to reject loan request.");
+                }
+                break;
+            case 3:
+                System.out.println("Review cancelled.");
+                break;
+        }
+    }
+    private void handleRecordBookPickup() {
+        System.out.println("\n--- Record Book Pickup ---");
+
+        List<Loan> approvedLoans = librarySystem.getApprovedLoans();
+
+        if (approvedLoans.isEmpty()) {
+            System.out.println("No approved loans found.");
+            return;
+        }
+
+        System.out.println("\nApproved loans:");
+        for (int i = 0; i < approvedLoans.size(); i++) {
+            Loan loan = approvedLoans.get(i);
+            String pickupStatus = loan.isPickedUp() ? "Picked up on " + loan.getActualPickupDate() : "Not picked up yet";
+            System.out.println((i + 1) + ". Student: " + loan.getStudentUsername() +
+                    " | Book ISBN: " + loan.getBookIsbn() +
+                    " | Status: " + pickupStatus);
+        }
+
+        System.out.print("Select loan to record pickup (0 to cancel): ");
+        int loanChoice = getIntInput(0, approvedLoans.size());
+
+        if (loanChoice == 0) {
+            return;
+        }
+
+        Loan selectedLoan = approvedLoans.get(loanChoice - 1);
+
+        if (selectedLoan.isPickedUp()) {
+            System.out.println("This book has already been picked up on " + selectedLoan.getActualPickupDate());
+            return;
+        }
+
+        System.out.print("Confirm recording pickup for student '" + selectedLoan.getStudentUsername() +
+                "' and book '" + selectedLoan.getBookIsbn() + "'? (y/n): ");
+        String confirmation = scanner.nextLine();
+
+        if (confirmation.equalsIgnoreCase("y")) {
+            if (librarySystem.recordBookPickup(selectedLoan.getStudentUsername(), selectedLoan.getBookIsbn())) {
+                System.out.println("Book pickup recorded successfully!");
+            } else {
+                System.out.println("Failed to record book pickup.");
+            }
+        } else {
+            System.out.println("Operation cancelled.");
         }
     }
 
@@ -298,38 +398,6 @@ public class MenuHandler {
         scanner.nextLine();
     }
 
-    private void reviewLoanRequest(Loan loan) {
-        System.out.println("\n--- Review Loan Request ---");
-        System.out.println("Request Details: " + loan);
-
-        System.out.println("\n1. Approve Request");
-        System.out.println("2. Reject Request");
-        System.out.println("3. Cancel");
-        System.out.print("Please enter your choice: ");
-
-        int choice = getIntInput(1, 3);
-
-        switch (choice) {
-            case 1:
-                if (librarySystem.approveLoanRequest(loan.getStudentUsername(), loan.getBookIsbn())) {
-                    System.out.println("Loan request approved successfully!");
-                    System.out.println("Student can now borrow the book from the library.");
-                } else {
-                    System.out.println("Failed to approve loan request.");
-                }
-                break;
-            case 2:
-                if (librarySystem.rejectLoanRequest(loan.getStudentUsername(), loan.getBookIsbn())) {
-                    System.out.println("Loan request rejected.");
-                } else {
-                    System.out.println("Failed to reject loan request.");
-                }
-                break;
-            case 3:
-                System.out.println("Review is not completed.");
-                break;
-        }
-    }
     private void ManageStudentStatus() {
         System.out.println("\n--- Manage Student Status ---");
 

@@ -29,6 +29,13 @@ public class LoanManager {
                 .collect(Collectors.toList());
     }
 
+    public List<Loan> getAllPendingLoans() {
+        return loans.stream()
+                .filter(loan -> loan.getStatus().equals("pending"))
+                .collect(Collectors.toList());
+    }
+
+
     public boolean approveLoan(String studentUsername, String bookIsbn) {
         for (Loan loan : loans) {
             if (loan.getStudentUsername().equals(studentUsername) &&
@@ -37,18 +44,21 @@ public class LoanManager {
 
                 loan.setStatus("approved");
                 loan.setActive(true);
+
                 Book book = bookManager.findBookByIsbn(bookIsbn);
                 if (book != null) {
                     book.setAvailable(false);
                 }
 
                 fileManager.saveLoans(loans);
-                bookManager.saveBooks();
+                fileManager.saveBooks(bookManager.getAllBooks());
+                System.out.println("Loan approved successfully!");
                 return true;
             }
         }
         return false;
     }
+
 
     public boolean rejectLoan(String studentUsername, String bookIsbn) {
         for (Loan loan : loans) {
@@ -138,13 +148,13 @@ public class LoanManager {
 
         if (targetBook != null) {
             targetBook.setAvailable(true);
-            bookManager.saveBooks();
+            fileManager.saveBooks(books);
         }
-
         fileManager.saveLoans(loans);
         System.out.println("Book returned successfully.");
         return true;
     }
+
     public List<Loan> getStudentLoans(String studentUsername) {
         return loans.stream()
                 .filter(loan -> loan.getStudentUsername().equals(studentUsername))
@@ -155,6 +165,21 @@ public class LoanManager {
         return loans.stream()
                 .filter(Loan::isActive)
                 .collect(Collectors.toList());
+    }
+    public boolean recordBookPickup(String studentUsername, String bookIsbn) {
+        for (Loan loan : loans) {
+            if (loan.getStudentUsername().equals(studentUsername) &&
+                    loan.getBookIsbn().equals(bookIsbn) &&
+                    "approved".equals(loan.getStatus())) {
+                loan.setActualPickupDate(LocalDate.now());
+                loan.setActive(true);
+                fileManager.saveLoans(loans);
+                System.out.println("Book pickup recorded successfully for student: " + studentUsername);
+                return true;
+            }
+        }
+        System.out.println("No approved loan found for this student and book.");
+        return false;
     }
 
     public List<Loan> getAllLoans() {
@@ -181,5 +206,22 @@ public class LoanManager {
                 .count();
 
         return new StudentLoanStatistics(totalLoans, notReturnedCount, lateReturnsCount, studentLoans);
+    }
+    public List<Loan> getApprovedButNotPickedUpLoans() {
+        return loans.stream()
+                .filter(loan -> "approved".equals(loan.getStatus()))
+                .filter(loan -> !loan.isPickedUp())
+                .collect(Collectors.toList());
+    }
+
+    public List<Loan> getActiveLoansToReturn() {
+        return loans.stream()
+                .filter(loan -> loan.isActive() && loan.isPickedUp() && !loan.isReturned())
+                .collect(Collectors.toList());
+    }
+    public List<Loan> getApprovedLoans() {
+        return loans.stream()
+                .filter(loan -> "approved".equals(loan.getStatus()))
+                .collect(Collectors.toList());
     }
 }
