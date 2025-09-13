@@ -3,7 +3,9 @@ package finalproject;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class LoanManager {
@@ -245,6 +247,58 @@ public class LoanManager {
     public List<Loan> getApprovedLoans() {
         return loans.stream()
                 .filter(loan -> "approved".equals(loan.getStatus()))
+                .collect(Collectors.toList());
+    }
+    public StudentLoanReport getStudentLoanReport(String studentUsername) {
+        List<Loan> studentLoans = getStudentLoanHistory(studentUsername);
+
+        int totalLoans = studentLoans.size();
+        int notReturnedCount = (int) studentLoans.stream()
+                .filter(loan -> loan.isActive() && "approved".equals(loan.getStatus()))
+                .count();
+
+        int lateReturnsCount = (int) studentLoans.stream()
+                .filter(loan -> loan.isReturned() && loan.getActualReturnDate().isAfter(loan.getEndDate()))
+                .count();
+
+        int onTimeReturnsCount = (int) studentLoans.stream()
+                .filter(loan -> loan.isReturned() &&
+                        !loan.getActualReturnDate().isAfter(loan.getEndDate()))
+                .count();
+
+        return new StudentLoanReport(studentUsername, totalLoans, notReturnedCount,
+                lateReturnsCount, onTimeReturnsCount, studentLoans);
+    }
+
+    public List<StudentDelayStats> getTopStudentsWithDelays(int limit) {
+        Map<String, List<Loan>> loansByStudent = loans.stream()
+                .filter(loan -> loan.isReturned())
+                .collect(Collectors.groupingBy(Loan::getStudentUsername));
+
+        List<StudentDelayStats> studentStats = new ArrayList<>();
+
+        for (Map.Entry<String, List<Loan>> entry : loansByStudent.entrySet()) {
+            String username = entry.getKey();
+            List<Loan> studentLoans = entry.getValue();
+
+            long totalDelayDays = studentLoans.stream()
+                    .filter(loan -> loan.getActualReturnDate().isAfter(loan.getEndDate()))
+                    .mapToLong(loan -> ChronoUnit.DAYS.between(
+                            loan.getEndDate(),
+                            loan.getActualReturnDate()
+                    ))
+                    .sum();
+
+            int delayedLoansCount = (int) studentLoans.stream()
+                    .filter(loan -> loan.getActualReturnDate().isAfter(loan.getEndDate()))
+                    .count();
+
+            studentStats.add(new StudentDelayStats(username, delayedLoansCount, totalDelayDays));
+        }
+
+        return studentStats.stream()
+                .sorted(Comparator.comparingInt(StudentDelayStats::getDelayedLoansCount).reversed())
+                .limit(limit)
                 .collect(Collectors.toList());
     }
 }

@@ -296,6 +296,27 @@ public class LibrarySystem {
     public void start() {
         menuHandler.displayMainMenu();
     }
+    public StudentLoanReport getStudentLoanReport(String studentUsername) {
+        return loanManager.getStudentLoanReport(studentUsername);
+    }
+
+    public List<StudentDelayStats> getTopStudentsWithDelays(int limit) {
+        return loanManager.getTopStudentsWithDelays(limit);
+    }
+
+    public void displayTopStudentsWithDelays() {
+        List<StudentDelayStats> topStudents = getTopStudentsWithDelays(10);
+
+        System.out.println("\n=== Top 10 Students with Most Delays ===");
+        if (topStudents.isEmpty()) {
+            System.out.println("No delayed returns found.");
+            return;
+        }
+
+        for (int i = 0; i < topStudents.size(); i++) {
+            System.out.println((i + 1) + ". " + topStudents.get(i));
+        }
+    }
 
     public static void main(String[] args) {
         LibrarySystem system = new LibrarySystem();
